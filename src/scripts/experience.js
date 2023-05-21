@@ -14,6 +14,11 @@ import { gsap } from "gsap";
 import Positions from './importAsset/positions';
 import Background from './background';
 import { InteractionManager } from 'three.interactive';
+
+//imagenes textura screen
+import info_default from '/src/images/info_default.png';
+import info_screen1 from '/src/images/info_screen1.png';
+import info_screen2 from '/src/images/info_screen2.png';
 export default class Experience{
 
     constructor(canvas){
@@ -182,9 +187,9 @@ export default class Experience{
 
     improveRotulo(){
         this.materials = new Array();
-        var tz = new THREE.TextureLoader().load( 'src/images/info_default.png' );
-        let tx = new THREE.TextureLoader().load( 'src/images/info_screen1.png' );
-        let ts = new THREE.TextureLoader().load( 'src/images/info_screen2.png' );
+        var tz = new THREE.TextureLoader().load( info_default );
+        let tx = new THREE.TextureLoader().load( info_screen1 );
+        let ts = new THREE.TextureLoader().load( info_screen2 );
         
 				
         tx.flipY=false; ts.flipY=false; tz.flipY=false;

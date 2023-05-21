@@ -2,12 +2,13 @@
 import * as THREE from 'three';
 
 import { gsap } from "gsap";
+import base from "/src/images/base.png";
 export default class Background{//creado con chatGPT
 
 
     constructor(scene){
         this.scene = scene;
-        const texture = new THREE.TextureLoader().load( "src/images/base.png" );
+        const texture = new THREE.TextureLoader().load( base );
         this.scene.background = texture;
         //this.particulas();
     }
