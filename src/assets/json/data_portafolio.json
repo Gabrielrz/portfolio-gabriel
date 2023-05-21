@@ -1,0 +1,56 @@
+{
+  "name": "descripciones de portafolio",
+  "descripciones": [
+    {
+      "titulo": "Dualad",
+      "descripcion": "Dualad es",
+      "tecnologias": [
+        "Php",
+        "Laravel",
+        "Firebase",
+        "Threejs",
+        "Cloud Vision",
+        "Javascript",
+        ""
+      ]
+    },
+    {
+      "titulo": "Glapp",
+      "descripcion": "Glapp es una aplicación en proceso que servirá para localizar artículos y productos locales..",
+      "tecnologias": [
+        "Java",
+        "Firebase",
+        "Google Cloud Vision",
+        "API rest php",
+        "Eroku bd",
+        "XML"
+      ],
+      "urlButton": "",
+      "urlGit": ""
+    },
+    {
+      "titulo": "Fiatec",
+      "descripcion": "Fiatec es una aplicación para dispositivos Android, que sirve para gestionar deudas o prestamos.",
+      "tecnologias": [
+        "Java",
+        "Firebase",
+        "Google Cloud Vision",
+        "MvvM"
+      ],
+      "urlButton": "",
+      "urlGit": ""
+    },
+    {
+      "titulo": "Sandfirg",
+      "descripcion": "Sandfirg es una aplicacion web para la la venta y distribusion de tonos de llamada para dispositivos moviles",
+      "tecnologias": [
+        "Php7",
+        "MySQL",
+        "Stripe pagos",
+        "Cloud Vision",
+        "Javascript",
+        "Paypal"
+      ]
+    }
+  ]
+}

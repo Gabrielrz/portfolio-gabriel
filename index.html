@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://kit.fontawesome.com/cee5d60a1e.js" crossorigin="anonymous"></script>
+    <title>Vite App</title>
+  </head>
+  <body>
+    
+    <div class="experience">
+      <div class="box_content">
+        <header>
+          <div class="box_btn">
+            <button id="navButton"><i class="fas fa-bars"></i></button>
+          </div>
+          <nav class="navbar" style="display: none;">
+            <!--<button id="navButtonClose"><i class="fas fa-times"></i></button>-->
+            <ul class="items">
+              <li><a href="#">Inicio</a></li>
+              <li><a href="#">Sobre mi</a></li>
+              <li><a href="#">Contacto</a></li>
+            </ul>
+          </nav>
+        </header>
+        <main> 
+          <div class="panel_Bienvenida">
+            <div class="box">
+              <span class="title">Bienvenido a mi portafolio</span>
+              <span class="name">por Gabriel Ramirez</span>
+            </div>
+            <button class="btn_continue"><i class="fas fa-chevron-circle-right"></i></button>
+          </div>
+
+          <div class="wondererContainer posA">
+
+            <div class="btn_directions posBtnA">
+              <button id="btnBack"><i class="fas fa-angle-left"></i></button>
+              <button id="btnNext"><i class="fas fa-angle-right"></i></button>
+            </div>
+            
+            <div class="panel_Descripcion"> 
+              <div class="body_description">
+                <span class="title_desc"> Fiatec </span>
+                <span class="description_desc">
+                  Fiatec es una aplicación para dispositivos
+                  Android, que sirve para gestionar deudas 
+                  o prestamos.
+                </span>
+                <span class="subtitle_desc">Tecnologias</span>
+                <ul class="tecnologies_desc">
+                  <li>Java</li>
+                  <li>Firebase</li>
+                  <li>Google Cloud Vision</li>
+                  <li>MvvM</li>
+                </ul>
+                <div class="box_btns_desc"> 
+                  <button><i class="fab fa-github"></i></button>
+                  <button><a>Pruebalo</a></button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          
+        </main>
+      </div>
+      <canvas class="m">
+      </canvas>
+    
+      
+    </div>
+    <script type="module" src="/main.js"></script>
+    
+  </body>
+</html>
