@@ -19,21 +19,20 @@ import { InteractionManager } from 'three.interactive';
 import info_default from '/src/images/info_default.png';
 import info_screen1 from '/src/images/info_screen1.png';
 import info_screen2 from '/src/images/info_screen2.png';
-import glt_url from  '/src/assets/museum4_current.gltf?url'
+import glt_url from  '/src/assets/museum6.gltf?url'
 export default class Experience{
 
     constructor(canvas){
-            this.positionMarker = 0;//se utiliza como referencia para los eventos eventsFocusElement y btnNextBackDescription
+            this.positionMarker = 0;//se utiliza como referencia para los eventos eventsFocusElement y eventsBtnsAuxiliar
             this.rotationSpeed = 0.001;
             this.sizes = new Sizes();
             this.positions  = new Positions();
             this.c= canvas;
             this.scene = new THREE.Scene();
-            //this.camera = new THREE.PerspectiveCamera( 50, this.sizes.aspect, 1, 1000 );
-			//this.camera.position.set( -32, 8, -30 );
+
             this.clock = new THREE.Clock();
            
-            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true});
+            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true,powerPreference: 'high-performance'});
             this.renderer.outputEncoding = THREE.sRGBEncoding;
             
             this.renderer.setSize( this.sizes.width, this.sizes.height );
@@ -41,18 +40,19 @@ export default class Experience{
 
             this.background = new Background(this.scene);
            
-          
-            //this.particulas(); creado con chatgpt
-            
+            this.camera = new THREE.PerspectiveCamera( 45, this.sizes.aspect, 1, 1000 );
+            this.camera.position.set( -32, 8, -30 );
+
             this.btnActiveMenu();
             this.btnWelcomeContinue();
-            this.btnNextBackDescription();
+            this.eventsBtnsAuxiliar();
             //this.btnNexBackAuxiliary();
             this.model =  new PortfolioGTLF(this.scene,glt_url);
             
             this.model.prom.then((gltf)=>{
-                this.camera = gltf.cameras[0];
-                this.camera.aspect = this.sizes.aspect;
+                //this.camera = gltf.cameras[0];
+                this.cameraDefault = gltf.cameras[0];
+                this.lod = this.model.lod;
                 this.screenMesh =  gltf.scene.getObjectByName('screen');
                 this.improveRotulo();
                 this.loadInteractionRotulo(this.screenMesh);
@@ -61,7 +61,7 @@ export default class Experience{
                 
                 this.eventsFocusElement(this.elements);
 
-                this.camera.position.set( -32, 8, -30 );
+                
                 this.builControls();
                 this.sizes.onResize(this.renderer,this.camera);
                 this.helper = new THREE.CameraHelper( gltf.cameras[0] );
@@ -76,6 +76,25 @@ export default class Experience{
 
             
     }
+    animate() {
+        requestAnimationFrame( this.animate.bind(this) );
+        
+        this.render();
+        /*console.log('rotacion camara:', this.camera.rotation);
+        console.log('posicion camara:',this.camera.position);
+        console.log('ADSA0',this.controls.target);*/
+        this.time = - performance.now() * 0.0003;
+    }
+
+    render(){
+        this.controls.update();
+        this.interactionManager.update();
+        this.lod.update();
+        this.renderer.render( this.scene, this.camera );
+    }
+
+
+
 
     /**
      * @description: busca en el objeto gltf los objetos coinsidentes por la propiedad userData
@@ -87,7 +106,6 @@ export default class Experience{
         objeto.traverse(function(objetoActual) {
           if (objetoActual.userData[userDataPropiedad] === userDataValor) {
             objetosEncontrados.push(objetoActual);
-            // Si solo deseas encontrar un objeto, puedes detener el recorrido estableciendo el objetoEncontrado y retornando false
             return false;
           }
         });
@@ -155,9 +173,7 @@ export default class Experience{
             this.interactionManager.add(element);
             element.addEventListener('click',(event)=>{
                 this.positionMarker = keys.indexOf(element.name);
-                this.routeAnimation(this.positionMarker,element)
-                //this.movePosition(positions[element.name].camera,positions[element.name].control);
-                //this.setDescriptions(data.descripciones.find(e => e.titulo==positions[element.name]));
+                this.routeAnimation(this.positionMarker)
             });
         });
        
@@ -215,28 +231,11 @@ export default class Experience{
             this.signHitBoxes.visible = true;
     }
 
-    animate() {
-        requestAnimationFrame( this.animate.bind(this) );
-      
-        this.render();
-        /*console.log('rotacion camara:', this.camera.rotation);
-        console.log('posicion camara:',this.camera.position);
-        console.log('ADSA0',this.controls.target);*/
-        this.time = - performance.now() * 0.0003;
-       
-    }
 
 
-
-    render(){
-        this.controls.update();
-        this.interactionManager.update();
-        this.renderer.render( this.scene, this.camera );
-        
-
-    }
-
-
+/**
+ * @idea 
+ * para que vaya a la posicion adecuada tambien tengo que dar una posicion fija de los controles */
     animationInitial(positions){
         var tl = gsap.timeline({ repeatDelay: 1});
         
@@ -255,8 +254,7 @@ export default class Experience{
             onUpdate:()=>{
 
                 this.camera.lookAt(0,0,0);
-                this.controls.update();
-
+                //this.controls.update();
             },
         });
 
@@ -265,12 +263,39 @@ export default class Experience{
             ease: 'power2.inOut',
                 onUpdate:()=>{
                     this.camera.lookAt(0,0,0);
-                    this.controls.update();
+                   // this.controls.update();
                 },
                 onComplete:()=>{
                     this.rotateCamera();
                     
                 }
+        });
+    }
+    rotateCamera(){
+        this.time = - performance.now() * 0.0003;
+        
+        gsap.to(this.camera.position,{
+            x:()=>{
+                return 10 * Math.cos(-performance.now() * 0.0003);
+            },
+            z:()=>{
+                return 10 * Math.sin(-performance.now() * 0.0003);
+            },
+            repeatRefresh:true,
+            ease:"linear",
+            duration:1.5,
+            onUpdate:()=>{
+                this.camera.lookAt( this.scene.position );
+                this.controls.update();
+            },
+            onComplete:()=>{
+                //posicion inicial Fiatec
+                /*this.movePosition(
+                    Object.values(this.positions.positionsAll)[0].camera,
+                    Object.values(this.positions.positionsAll)[0].control);
+                this.setDescriptions(data.descripciones.find(e => e.titulo=='Fiatec'));*/
+                this.routeAnimation(0);
+            }
         });
     }
                 
@@ -306,33 +331,7 @@ export default class Experience{
             });
         }
 
-        rotateCamera(){
-            this.time = - performance.now() * 0.0003;
-            
-            gsap.to(this.camera.position,{
-                x:()=>{
-                    return 10 * Math.cos(-performance.now() * 0.0003);
-                },
-                z:()=>{
-                    return 10 * Math.sin(-performance.now() * 0.0003);
-                },
-                repeatRefresh:true,
-                ease:"linear",
-                duration:1.5,
-                onUpdate:()=>{
-                    this.camera.lookAt( this.scene.position );
-                    this.controls.update();
-                },
-                onComplete:()=>{
-                    //posicion inicial Fiatec
-                    /*this.movePosition(
-                        Object.values(this.positions.positionsAll)[0].camera,
-                        Object.values(this.positions.positionsAll)[0].control);
-                    this.setDescriptions(data.descripciones.find(e => e.titulo=='Fiatec'));*/
-                    this.routeAnimation(0,null);
-                }
-            });
-        }
+       
 
 
 
@@ -393,56 +392,86 @@ export default class Experience{
          * asi no es necesario tener un orden especifico de los datos en data_portafolio.json
          * (distinge entre mayusculas y minusc)
          */
-        btnNextBackDescription(){
+        eventsBtnsAuxiliar(){
             
             document.querySelector('#btnBack')
             .addEventListener('click',()=>{
                 (this.positionMarker>0)?this.positionMarker--:console.log('tope');
-                this.routeAnimation(this.positionMarker,null);
+                this.routeAnimation(this.positionMarker);
             });
             document.querySelector('#btnNext')
             .addEventListener('click',()=>{
                 console.log(data.descripciones.length);
                 (this.positionMarker==0||this.positionMarker<(Object.keys( this.positions.positionsAll).length-1))?this.positionMarker++:console.log('tope');
-                this.routeAnimation(this.positionMarker,null); 
+                this.routeAnimation(this.positionMarker); 
                 
+            });
+            document.querySelector('#btnClose')
+            .addEventListener('click',()=>{
+                //cerrar descripcion y reposicionar camara
+                this.movePosition(this.cameraDefault.position,this.controls.target);
+                this.switchDecoration('C');
             });
         }
 
-        routeAnimation(i=null,element=null){
+        routeAnimation(i){
             let positions = this.positions.positionsAll;
             let positionValues = Object.values(positions);
             let positionsKeys = Object.keys(positions);
-            let panelDescripcion = document.querySelector('.panel_Descripcion');
-            let panelAndante = document.querySelector('.wondererContainer');
-            let contenedorBtns = document.querySelector('.btn_directions');
-            let panelBienvenida = document.querySelector('.panel_Bienvenida');
-            panelBienvenida.style.display  = 'none';            
+            
+                 
             
             let posCamera =  positionValues[i].camera;
             let posControl =  positionValues[i].control; 
             let name =  positionsKeys[i];
-
+            //switch default
             if(positionsKeys[i]==this.nombres.PANTALLA){
-                panelDescripcion.style.display = 'none';
-                panelAndante.classList.replace('posA','posB');
-                contenedorBtns.classList.replace('posBtnA','posBtnB');
+                //switch b
+                this.switchDecoration('B');
                 this.movePosition(posCamera,posControl);
                 //play animations pantalla 
                
             }else if(positionsKeys[i]==this.nombres.REDES){
-                panelDescripcion.style.display = 'none';
-                panelAndante.classList.replace('posA','posB');
-                contenedorBtns.classList.replace('posBtnA','posBtnB');
+                //switch b
+                this.switchDecoration('B');
                 this.movePosition(posCamera,posControl);
                 console.log("Redes"); 
 
             } else{
-                panelAndante.classList.replace('posB','posA');
-                contenedorBtns.classList.replace('posBtnB','posBtnA');
+                //switch A
+               this.switchDecoration('A');
                 
                 this.movePosition(posCamera,posControl);
                 this.setDescriptions(data.descripciones.find(e => e.titulo==name));
+            }
+        }
+
+        switchDecoration(pos='B'){
+            let panelDescripcion = document.querySelector('.panel_Descripcion');
+            let panelAndante = document.querySelector('.wondererContainer');
+            let boxBtnDirections = document.querySelector('.btn_directions');
+            let panelBienvenida = document.querySelector('.panel_Bienvenida');
+            let boxAuxBtns = document.querySelector('.aux_btns');
+            switch (pos) {
+                case 'A':
+                    panelAndante.classList.replace('posB','posA');
+                    boxBtnDirections.classList.replace('posBtnB','posBtnA');
+                    boxAuxBtns.classList.replace('auxB','auxA');
+                    break;
+                case 'B': 
+                    panelAndante.style.display = 'block';
+                    panelDescripcion.style.display = 'none';
+                    panelAndante.classList.replace('posA','posB');
+                    boxBtnDirections.classList.replace('posBtnA','posBtnB');
+                    boxAuxBtns.classList.replace('auxA','auxB');
+                    break;
+                case 'C':
+                    panelDescripcion.style.display = 'none';
+                    panelAndante.style.display = 'none';
+                    break;
+                default:
+                    panelBienvenida.style.display  = 'none';       
+                    break;
             }
         }
 
