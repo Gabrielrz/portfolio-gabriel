@@ -85,13 +85,19 @@ canvas.m{
 .box_content{
   width: 100%;
   position: relative;/*no ocupa toda la pantalla pero conserva propiedades en los hijos*/
-  border: 1px solid blue;
+  
+}
+.box_content::after{
+  content: "";
+  clear: both;
+  display: block;
 }
 header{
   position: absolute;
   width: 100%;
   height: 80px;
   background: var(--color-header-opacity);
+  z-index: 1;
 }
 
 .box_content main{
@@ -101,7 +107,6 @@ header{
   left: 50px;
   width: 100%;
   height: 100%;
-  /*border: 1px solid red;*/
 }
 main .panel_Bienvenida{
   width: 500px;
@@ -239,14 +244,40 @@ nav .items a {
 /*fin nav*/
 
 /*panel descripcion de objetos*/
-.wondererContainer{
+.wondererContainer{ 
+  /*posicion inicial relativa en wonderContainer debido a posA en animateBack*/
   display: none;
-}
-.wondererContainer.posA{/*auxiliar togle*/
+  border: 1px solid red;
   
+}
+
+.wondererContainer.posA{/*auxiliar togle*/
+ 
   animation-duration: .3s;
   animation-name: animateBack;
   animation-fill-mode: forwards;
+  z-index: 3;
+}
+@keyframes animateBack {/*botones en posicion con descripcion*/
+  
+  from {/*parte de la posicion de animatenext*/
+    position: absolute;
+    display: block;
+    top: calc(85vh - 200px);
+    left: calc((50% - 12%) - 50px);
+    width: 18%;
+    background: var(--color-yellow-opacity);
+  }
+  to {
+    position: relative;
+    right: -45%;
+    top: -50px;
+    width: 420px;
+    height: 490px;
+    background-color: transparent;
+   
+  }
+  
 }
 .wondererContainer.posB{/*auxiliar togle*/
  
@@ -264,45 +295,22 @@ nav .items a {
   from {
     position: relative;
     right: -45%;
-    left: 0;
     top: -50px;
     width: 420px;
     height: 490px;
-    margin: auto;
     background-color: transparent;
   }
   to {
     position: absolute;
     display: block;
     top: calc(85vh - 200px);/*200px de contenedor main*/
-    left: calc(50% - 50px);/*left:50px de contenedor main*/
-    transform: translate(-50%);
-    width: 10%;
+    left: calc((50% - 12%) - 50px);
+    /*left:50px de contenedor main y 9% de widthwonderContainer/2 + 3%=12% de margen*/
+    width: 18%;
     background: var(--color-yellow-opacity);
   }
 }
-@keyframes animateBack {/*botones en posicion con descripcion*/
-  
-  from {
-    position: absolute;
-    width: 10%;
-    right: 0;
-    top: 60vh;
-    display: block;
-    margin: auto;
-    right: 0;  
-    left: 0;
-    background: var(--color-yellow-opacity);
-  }
-  to {
-    position: relative;
-    right: -45%;
-    top: -50px;
-    width: 420px;
-    height: 490px;
-    background-color: transparent;
-  }
-}
+
 
 .panel_Descripcion{
   
@@ -397,44 +405,62 @@ nav .items a {
 }
 
 /*button directions*/
-.wondererContainer.posA .posBtnA{/**auxiliar btn togle*/
-   width: 150%;
-   position: absolute;
-   top: 40%;
-   left: -25%;
-}
 
-.wondererContainer.posA .posBtnB{/**auxiliar btn togle*/
-    /*se aplica estilo solo en el contenedor (tiene que estar vacia)*/
-    animation-duration: .1s;
-    animation-name: animatePos;
-    animation-fill-mode: forwards;
-    animation-timing-function: linear;
-}
-
-@keyframes animatePos {
-  from{
-    width: 150%;
-    position: absolute;
-    top: 40%;
-    left: -25%;
-  }
-  to{
-    width: auto;
-    position: initial;
-    top: initial;
-    left: initial;
-  }
-}
 
 .wondererContainer .btn_directions{
   
   display: block;
-  /*border: 1px solid blue;  */
   
 }
+.wondererContainer .btn_directions::after{
+  content: "";
+  display: block;
+  clear: both;
+}
+.wondererContainer .aux_btns{
 
-.wondererContainer .btn_directions button{
+  width: 100%;
+  height: 100%;
+}
+.wondererContainer .aux_btns.auxA{
+  position: absolute;
+}
+.wondererContainer .aux_btns.auxB{
+  position: none;
+}
+
+
+.btn_directions.posBtnA{/**call in js method switchDecoration*/
+  width: 150%;
+  position: absolute;
+  top: 40%;
+  left: -25%;
+  }
+
+.btn_directions.posBtnB{/**call in js method switchDecoration*/
+   /*se aplica estilo solo en el contenedor (tiene que estar vacia)*/
+   animation-duration: .1s;
+   animation-name: animatePos;
+   animation-fill-mode: forwards;
+   animation-timing-function: linear;
+}
+
+@keyframes animatePos {
+ from{
+   width: 150%;
+   position: absolute;
+   top: 40%;
+   left: -25%;
+ }
+ to{
+   width: auto;
+   display: block;
+   position: initial;
+   top: initial;
+   left: initial;
+   }
+}
+.wondererContainer .aux_btns button{
  
   color:var(--color-blue-light);
   font-size: 70px;
@@ -443,18 +469,73 @@ nav .items a {
   cursor: pointer;
 
 }
-.wondererContainer .btn_directions button i{
+.wondererContainer .aux_btns button i{
   filter: drop-shadow(3px 6px 6px rgba(0, 0, 0, 0.20));
 }
-.wondererContainer .btn_directions button:nth-child(1)
+.wondererContainer .aux_btns .boxBtnClose{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.wondererContainer .aux_btns .boxBtnClose::after{
+  content: "";
+  display: block;
+  clear: both;
+
+}
+.wondererContainer .aux_btns .boxBtnClose button:nth-child(1)
+{
+  display: inline;
+  float: right;
+  font-size: 40px;
+  padding: 10px 20px;
+}
+
+
+.wondererContainer .aux_btns .btn_directions button:nth-child(1)
 {
   float: left;
 }
-.wondererContainer .btn_directions button:nth-child(2){
+.wondererContainer .aux_btns .btn_directions button:nth-child(2){
   float: right;
 }
 
+
+
+/**call from js @method: switchDecoration*/
+.wondererContainer .aux_btns.auxB .boxBtnClose button:nth-child(1){
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a auxB */
+  float: none;
+  width: 100%;
+  margin: auto;
+  padding: 20px;
+}
+.wondererContainer .btn_directions.posBtnB button:nth-child(1){
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a posBtnB*/ 
+  float: left;
+}
+.wondererContainer .btn_directions.posBtnB button:nth-child(2){
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a posBtnB */
+  float:right;
+}
 /**fin buttons directions*/
+
+
+/*contenedeor de sombra modal no en uso*/
+.modal_shadow{
+border: 1px solid black;
+position: absolute;
+top: calc(0px - 200px);/*200 main*/
+left: calc(0px - 50px);
+width: 100vw;
+height: 100vh;
+display: none;
+background: rgba(255, 255, 255, 0.001);
+backdrop-filter: blur(2px);
+z-index: 2;
+}
+
+
 
 /*layout movil*/
 @media only screen and (max-width:768px) {
@@ -623,23 +704,20 @@ nav .items a {
 
 /*panel descripcion de objetos movil*/
 .wondererContainer.posA{/*auxiliar togle*/
-  width: 70%;
-  height: 350px;
-  position: relative;
-  right: 0;
-  top: calc(45vh - 400px);
-  margin: auto;
+  
   animation-duration: .3s;
   animation-name: animateBack;
   animation-fill-mode: forwards;
+
+  
 }
 @keyframes animateBack {
   
   from {
-    position: absolute;
+    position: absolute;   
+    top:calc(90vh - 400px);/*(-400) de main*/
+    left: calc(50% - 22%);
     width: 40%;
-    right: 0;
-    top:calc(85vh - 400px);/*(-400) de main*/
     margin: auto;
   }
   to {
@@ -652,39 +730,53 @@ nav .items a {
   }
 }
 .wondererContainer.posB{/*auxiliar togle*/
-  position: absolute;
-  width: 40%;
-  right: 0;
-  left: 0;
-  top:calc(85vh - 400px);/*(-400) de main*/
-  margin: auto;
-  background: var(--color-yellow-opacity);
-
+ 
   border-radius: 10px;
   background: var(--color-yellow-opacity);
-  animation-duration: .3s;
-  animation-name: animateNext;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
+  animation: animateNext 1s ease 0s 1 normal forwards;
 }
 
-
+/*animacion de expancion junto con posicion*/
 @keyframes animateNext {
-  from {
+
+  0% {
     width: 70%;
     height: 350px;
     position: relative;
     right: 0;
-    top: -60px;
+    top: calc(45vh - 400px);
     margin: auto;
-  }
-  to {
-    position: absolute;
-    width: 30%;
-    right: 0;
+		transform: scale3d(1, 1, 1);
+	}
+
+	30% {
+		transform: scale3d(1.25, 0.75, 1);
+	}
+
+	40% {
+		transform: scale3d(0.75, 1.25, 1);
+	}
+
+	50% {
+		transform: scale3d(1.15, 0.85, 1);
+	}
+
+	65% {
+		transform: scale3d(0.95, 1.05, 1);
+	}
+
+	75% {
+		transform: scale3d(1.05, 0.95, 1);
+	}
+
+	100% {
+    position: absolute;   
     top:calc(90vh - 400px);/*(-400) de main*/
+    left: calc(50% - 22%);/*-22& =  40% width/2 + 2 margen*/
+    width: 40%;
     margin: auto;
-  }
+		transform: scale3d(1, 1, 1);
+	}
 }
 
 
@@ -780,57 +872,121 @@ nav .items a {
 }
 
 /*button directions*/
-.wondererContainer.posA .posBtnA{/**auxiliar btn togle*/
+
+.wondererContainer .btn_directions{
   
-  width: 135%;
   display: block;
+  
+}
+.wondererContainer .btn_directions::after{
+  content: "";
+  display: block;
+  clear: both;
+}
+.wondererContainer .aux_btns{
+
+  width: 100%;
+  height: 100%;
+}
+.wondererContainer .aux_btns.auxA{
   position: absolute;
-  top: 40%;
-  left: -17%;
+}
+.wondererContainer .aux_btns.auxB{
+  position: none;
 }
 
-.wondererContainer.posA .posBtnB{/**auxiliar btn togle*/
+
+.btn_directions.posBtnA{/**call in js method switchDecoration*/
+  width: 130%;/*width:70 wonderContainer + 30% = 100% + 15% left and right*/
+  position: absolute;
+  top: 40%;
+  left: -15%;/*15 left and right*/
+
+}
+
+.btn_directions.posBtnB{/**call in js method switchDecoration*/
    /*se aplica estilo solo en el contenedor (tiene que estar vacia)*/
    animation-duration: .1s;
    animation-name: animatePos;
    animation-fill-mode: forwards;
    animation-timing-function: linear;
 }
+
 @keyframes animatePos {
-  from{
-    width: 135%;
-    display: block;
-    position: absolute;
-    top: 40%;
-    left: -17%;
-  }
-  to{
-    width: auto;
-    position: initial;
-    top: initial;
-    left: initial;
-  }
+ from{
+   width: 150%;
+   position: absolute;
+   top: 40%;
+   left: -25%;
+ }
+ to{
+   width: auto;
+   display: block;
+   position: initial;
+   top: initial;
+   left: initial;
+ }
 }
 
-.wondererContainer .btn_directions button{
- 
+ /*estilos de botones auxiliares movil*/
+.wondererContainer .aux_btns button{
   color:var(--color-blue-light);
-  font-size: 40px;
+  font-size: 44px;
   background: none;
   border: none;
   cursor: pointer;
-
 }
-.wondererContainer .btn_directions button i{
+.wondererContainer .aux_btns button i{
   filter: drop-shadow(3px 6px 6px rgba(0, 0, 0, 0.20));
 }
-.wondererContainer .btn_directions button:nth-child(1)
+.wondererContainer .aux_btns .boxBtnClose{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.wondererContainer .aux_btns .boxBtnClose::after{
+  content: "";
+  display: block;
+  clear: both;
+
+}
+.wondererContainer .aux_btns .boxBtnClose button:nth-child(1)
+{
+  display: inline;
+  float: right;
+  font-size: 25px;
+  padding: 10px 15px;
+}
+
+
+.wondererContainer .aux_btns .btn_directions button:nth-child(1)
 {
   float: left;
 }
-.wondererContainer .btn_directions button:nth-child(2){
+.wondererContainer .aux_btns .btn_directions button:nth-child(2){
   float: right;
 }
+
+
+
+/**call from js @method: switchDecoration*/
+.wondererContainer .aux_btns.auxB .boxBtnClose button:nth-child(1){/*btn close*/
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a auxB */
+  float: none;
+  width: 100%;
+  margin: auto;
+  padding: 12px;
+}
+.wondererContainer .btn_directions.posBtnB button:nth-child(1){
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a posBtnB*/ 
+  float: left;
+}
+.wondererContainer .btn_directions.posBtnB button:nth-child(2){
+  /*no es necesario llamar desde js, es toggle automatico cuando llama a posBtnB */
+  float:right;
+}
+/**fin buttons directions*/
+
 
 
 

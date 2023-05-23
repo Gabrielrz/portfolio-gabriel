@@ -2,3 +2,17 @@
 
 
 //ESTA ES UNA INTEGRACION DE THREE PERO CON vanilla framework (es decir js puro) y vite
+
+22-05-2023
+//para actualizar el repositiorio visual de paginas en github hay que ejecutar el siguiente comando git 
+git subtree push --prefix dist origin gh-pages
+
+esto actualiza o crea un subrepositorio (se utiliza para escojer que carpeta sera la ruta raiz del proyecto desde el cual ejecutara el servidor)
+https://gist.github.com/sunjc826/3ab0cb60be87935a0809b66e57bf9d79
+
+con una base en vite.config.js vacia(si se elige la ruta gh-pages en github previamente )
+NOTA: el servidor de github tarda en recargar el proyecto
+(lo mejor es hacerlo manualmente en la seccion de paginas en las opciones que aparecen alado del enlace)
+
+
+
