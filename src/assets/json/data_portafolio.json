@@ -3,7 +3,7 @@
   "descripciones": [
     {
       "titulo": "Dualad",
-      "descripcion": "Dualad es",
+      "descripcion": "Dualad es una aplicacion en la que puedes adquirir un cubo en un espacio 3D y decorarlo con una imagen a modo de anuncio publicitario",
       "tecnologias": [
         "Php",
         "Laravel",
@@ -12,7 +12,10 @@
         "Cloud Vision",
         "Javascript",
         ""
-      ]
+      ],
+      "urlButton": "https://www.dualad.es",
+      "urlGit": "https://github.com/Gabrielrz",
+      "urlInfo":""
     },
     {
       "titulo": "Glapp",
@@ -26,7 +29,8 @@
         "XML"
       ],
       "urlButton": "",
-      "urlGit": ""
+      "urlGit": "",
+      "urlInfo":"https://twitter.com/gabriel28420839"
     },
     {
       "titulo": "Fiatec",
@@ -37,8 +41,9 @@
         "Google Cloud Vision",
         "MvvM"
       ],
-      "urlButton": "",
-      "urlGit": ""
+      "urlButton": "https://play.google.com/store/apps/details?id=com.regular.fiatec",
+      "urlGit": "https://github.com/Gabrielrz/Fiatec-info",
+      "urlInfo":""
     },
     {
       "titulo": "Sandfirg",
@@ -50,7 +55,10 @@
         "Cloud Vision",
         "Javascript",
         "Paypal"
-      ]
+      ],
+      "urlButton": "",
+      "urlGit": "https://github.com/Gabrielrz/SandFirg-info",
+      "urlInfo":"https://twitter.com/gabriel28420839"
     }
   ]
 }
