@@ -41,8 +41,13 @@ export default class Experience{
             this.background = new Background(this.scene);
            
             this.camera = new THREE.PerspectiveCamera( 45, this.sizes.aspect, 1, 1000 );
-            this.camera.position.set( -32, 8, -30 );
+            const initPosC = this.positions.positionInitialMuseum.camera;
+            this.camera.position.set(initPosC.x,initPosC.y,initPosC.z );
 
+
+            //interaction manager
+            this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
+            
             this.btnActiveMenu();
             this.btnWelcomeContinue();
             this.eventsBtnsAuxiliar();
@@ -50,33 +55,53 @@ export default class Experience{
             this.model =  new PortfolioGTLF(this.scene,glt_url);
             
             this.model.prom.then((gltf)=>{
-                //this.camera = gltf.cameras[0];
+                this.lodL = this.model.lodL;
+                this.eventLod(this.lodL);
                 this.cameraDefault = gltf.cameras[0];
-                this.lod = this.model.lod;
-                this.screenMesh =  gltf.scene.getObjectByName('screen');
-                this.improveRotulo();
-                this.loadInteractionRotulo(this.screenMesh);
-
-                this.elements = this.buscarObjetosPorUserData(gltf.scene,'focus',true);
+               
+               
                 
-                this.eventsFocusElement(this.elements);
-
+               
                 
-                this.builControls();
+                this.buildControls();
                 this.sizes.onResize(this.renderer,this.camera);
-                this.helper = new THREE.CameraHelper( gltf.cameras[0] );
-                //this.scene.add( this.helper );
                 
-                //this.helper.update();
-                const axesHelper = new THREE.AxesHelper( 5 );
-                this.scene.add( axesHelper );
                 this.animate();
                 
+        
             });
 
             
     }
+    /**
+     * @description este metodo recorre los objetos contenidos dentro 
+     * de el objeto LOD y aplica los eventos a todos ellos a la vez.
+     * @warning los eventos se llamaran al mismo tiempo 
+     * independientemente del nivel de detalle actual y el objeto actual(solucionar en el futuro)
+     * @method on es llamado cada vez que el nivel de detalle cambia.
+     * @param {*} lodL recibe un objeto de la clase Lodl
+     */
+    eventLod(lodL){
+    
+        lodL.on('level_changed',(e)=>{
+            this.interactionManager.dispose();
+            this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
+
+            let distance = this.lodL.levels[lodL.lod.getCurrentLevel()];
+            let currentObject = this.lodL.lod.getObjectForDistance(distance);
+            
+            this.screenMesh =  currentObject.getObjectByName('screen');
+            this.improveRotulo(this.screenMesh);
+            this.loadInteractionRotulo(this.screenMesh);
+
+            this.elements = this.buscarObjetosPorUserData(currentObject,'focus',true);    
+            this.eventsFocusElement(this.elements);
+
+            console.log('cambio de LOD');
+        });
+    }
     animate() {
+        
         requestAnimationFrame( this.animate.bind(this) );
         
         this.render();
@@ -89,7 +114,8 @@ export default class Experience{
     render(){
         this.controls.update();
         this.interactionManager.update();
-        this.lod.update();
+        this.lodL.lod.update(this.camera);
+        this.lodL.checkLODLevel(this.camera);
         this.renderer.render( this.scene, this.camera );
     }
 
@@ -109,7 +135,7 @@ export default class Experience{
             return false;
           }
         });
-      
+        
         return objetosEncontrados;
     }
 
@@ -133,31 +159,28 @@ export default class Experience{
     }
 
     loadInteractionRotulo(object){/*interacion para rotulo */
-        this.interactionManager = new InteractionManager(
-            this.renderer,
-            this.camera,
-            this.renderer.domElement
-          );
+          
           this.interactionManager.add(object);
-          this.eventsRotulo()
+          this.eventsRotulo(object);
+         
     }
 
 
-    eventsRotulo(){
-        let i = 1;//en lugar de hacer click para cambiar screen, lo utilizare para links y demas segun combenga
-        this.screenMesh.addEventListener('mouseover',()=>{
+    eventsRotulo(screenMesh){
+        let i = 1;
+       screenMesh.addEventListener('mouseover',()=>{
             document.body.style.cursor = 'pointer';
         });
-        this.screenMesh.addEventListener('mouseout', (event) => {
+        screenMesh.addEventListener('mouseout', (event) => {
             event.target.material.color.set(0xffffff);
             document.body.style.cursor = 'default';
           });
-        this.screenMesh.addEventListener('click',(e)=>{
-            console.log(this.materials.length);
+        screenMesh.addEventListener('click',(event)=>{
+            //event.stopPropagation();
+           
             //i empieza en 1
-            //(i>=3)? window.open('https://google.com',i=0) : console.log('menor');
-            (i < this.materials.length) ? (this.screenMesh.material = this.materials[i], i++) : console.log('stopscreen');
-            
+            (i>=3)? window.open('https://github.com/Gabrielrz/portfolio-gabriel',i=0) : console.log('menor');//cambiar por mesh
+            (i < this.materials.length) ? (screenMesh.material = this.materials[i], i++) : console.log('stopscreen');
         });
     }
 
@@ -167,13 +190,17 @@ export default class Experience{
      */
     eventsFocusElement(elements){
         
-        let positions = this.positions.positionsAll;
+        let positions = this.positions.getPositions;
         let keys = Object.keys(positions);
+        
         elements.forEach(element => {
             this.interactionManager.add(element);
             element.addEventListener('click',(event)=>{
+                event.target = 'focusEvent';
+                event.stopPropagation();
                 this.positionMarker = keys.indexOf(element.name);
                 this.routeAnimation(this.positionMarker)
+                console.log("llamada");
             });
         });
        
@@ -184,17 +211,21 @@ export default class Experience{
     }
 
 
-    builControls(){
+    buildControls(){
         //controls
         this.controls = new OrbitControls( this.camera, this.renderer.domElement );
-        this.controls.target.set( 4, 7.5,-1);
+        const initPos = this.positions.positionInitialMuseum.control;
+        this.controls.target.set( initPos.x,initPos.y,initPos.z);
         this.controls.listenToKeyEvents( window ); // optional
         this.controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
 		this.controls.dampingFactor = 0.05;
+        //this.controls.enableZoom = false;
+		this.controls.enablePan = false;
+        
         this.controls.screenSpacePanning = false;
 
-	    //this.controls.minDistance = 100;
-		//this.controls.maxDistance = 500;
+	   // this.controls.minDistance = 100;
+		this.controls.maxDistance = 200;
 
 
 		this.controls.maxPolarAngle = Math.PI / 2;
@@ -202,8 +233,8 @@ export default class Experience{
     }
 
 
-    improveRotulo(){
-        this.materials = new Array();
+    improveRotulo(screenMesh){
+        this.materials = [];
         var tz = new THREE.TextureLoader().load( info_default );
         let tx = new THREE.TextureLoader().load( info_screen1 );
         let ts = new THREE.TextureLoader().load( info_screen2 );
@@ -213,11 +244,10 @@ export default class Experience{
         this.materials.push(new THREE.MeshBasicMaterial( {map:tz }));
         this.materials.push(new THREE.MeshBasicMaterial( { map: tx } ));
         this.materials.push(new THREE.MeshBasicMaterial( {map:ts }));
-        this.screenMesh.material = this.materials[0];
+        screenMesh.material = this.materials[0];
 
 
-   
-        
+        console.log(this.materials);
  
         //mallas de eventos
         this.signHitBoxes = new THREE.Group()
@@ -233,47 +263,15 @@ export default class Experience{
 
 
 
-/**
- * @idea 
- * para que vaya a la posicion adecuada tambien tengo que dar una posicion fija de los controles */
     animationInitial(positions){
-        var tl = gsap.timeline({ repeatDelay: 1});
-        
-        tl.to(this.controls.object.position,{
-            x:positions.positionA.x, y:positions.positionA.y, z: positions.positionA.z,duration:1.5,
-            ease: 'power2.inOut',
-            onUpdate:()=>{
-               
-                //this.camera.lookAt(positions.positionA.x, positions.positionA.y,positions.positionA.z);
-               // this.controls.update();
-            },
-        })
-        tl.to(this.controls.object.position,{
-        x:positions.positionB.x, y:positions.positionB.y, z: positions.positionB.z,duration:1.5,
-        ease:'power2.inOut',
-            onUpdate:()=>{
-
-                this.camera.lookAt(0,0,0);
-                //this.controls.update();
-            },
-        });
-
-        tl.to(this.controls.object.position,{
-            x:positions.positionC.x, y:positions.positionC.y, z: positions.positionC.z,duration:1.5,
-            ease: 'power2.inOut',
-                onUpdate:()=>{
-                    this.camera.lookAt(0,0,0);
-                   // this.controls.update();
-                },
-                onComplete:()=>{
-                    this.rotateCamera();
-                    
-                }
-        });
+        var master = gsap.timeline({ onComplete:()=>{this.rotateCamera()}});
+        master.add(this.movePositionAnim(positions.pA.camera,positions.pA.control))     
+        .add(this.movePositionAnim(positions.pB.camera,positions.pB.control), "-=1")
+        .add(this.movePositionAnim(positions.pC.camera,positions.pC.control), "-=1")
     }
+
     rotateCamera(){
         this.time = - performance.now() * 0.0003;
-        
         gsap.to(this.camera.position,{
             x:()=>{
                 return 10 * Math.cos(-performance.now() * 0.0003);
@@ -289,11 +287,6 @@ export default class Experience{
                 this.controls.update();
             },
             onComplete:()=>{
-                //posicion inicial Fiatec
-                /*this.movePosition(
-                    Object.values(this.positions.positionsAll)[0].camera,
-                    Object.values(this.positions.positionsAll)[0].control);
-                this.setDescriptions(data.descripciones.find(e => e.titulo=='Fiatec'));*/
                 this.routeAnimation(0);
             }
         });
@@ -331,16 +324,47 @@ export default class Experience{
             });
         }
 
-       
+        /**
+         * @description aplica una animacion y devuelve el timeline gsap
+         * @param {*} pCamera 
+         * @param {*} pControls 
+         * @returns tl gsap timeline
+         */
+        movePositionAnim(pCamera,pControls){
+        var tl = gsap.timeline({ repeatDelay: 1});
+            tl.to(this.controls.object.position,{
+                x:pCamera.x,
+                y:pCamera.y,
+                z:pCamera.z,
+                duration:1.5,
+                ease: 'power2.inOut',
+                    onUpdate:()=>{
+                        this.camera.lookAt(pControls.x,pControls.y,pControls.z);     
+                    }
+            });
+            tl.to(this.controls.target,{
+                x:pControls.x,
+                y:pControls.y,
+                z:pControls.z,
+                duration:1,
+                ease: 'power2.inOut',
+                    onUpdate:()=>{
+                        this.controls.update();
+                    },
+                    onComplete:()=>{
+                    }
+            });
+            return tl;
+        }
 
 
 
         /**
-         * descripcion: despliega el cuadro de descripciones
+         * @description: despliega el cuadro de descripciones
          * y busca en el html las etiquetas y reescribe la informacion.
-         * @param descripcion : es un objeto de datos de data_portafolio.json 
+         * @param data : es un objeto de datos de data_portafolio.json 
          */
-        setDescriptions(descripcion){
+        setDescriptions(data){
                 document.querySelector('.panel_Descripcion').style.display = 'block';
                 document.querySelector('.wondererContainer').style.display = 'block';
                 let d = document.querySelector(".body_description");
@@ -348,14 +372,36 @@ export default class Experience{
                 let titleLabel = children[0];
                 let descripcionLabel = children[1];
                 let tecnologiasList  = children[3];
+                let btnGit = document.querySelector('#link_github');
+                let btnWeb = document.querySelector('#link_web');
+                let btnInfo = document.querySelector('#link_info');
                 
-                titleLabel.innerHTML = descripcion.titulo;
-                descripcionLabel.innerHTML = descripcion.descripcion;
+                titleLabel.innerHTML = data.titulo;
+                descripcionLabel.innerHTML = data.descripcion;
                 tecnologiasList.innerHTML = '';
-                descripcion.tecnologias.forEach(element => {
+                data.tecnologias.forEach(element => {
                     let li = document.createElement('li'); li.textContent = element;
                     tecnologiasList.appendChild(li);
                 });
+
+
+                btnGit.style.display = 'none';
+                btnWeb.style.display = 'none';
+                btnInfo.style.display = 'none';
+
+                if (data.urlGit != "") {
+                    btnGit.style.display = 'inline';
+                    btnGit.href = data.urlGit;
+                }
+                if (data.urlButton != "") {
+                    btnWeb.style.display = 'inline';
+                    btnWeb.href = data.urlButton;
+                }
+                if (data.urlInfo != "") {
+                    btnInfo.style.display = 'inline';
+                    btnInfo.href = data.urlInfo;
+                }
+               
                 
                 
                 
@@ -377,7 +423,7 @@ export default class Experience{
             btn.addEventListener('click',()=>{
                 document.querySelector('.panel_Bienvenida').style.display = 'none';
                 
-                this.animationInitial(this.positions.getPositionAnimationPuerta);
+                this.animationInitial(this.positions.mainAnimation);
                
             });
         }
@@ -402,7 +448,7 @@ export default class Experience{
             document.querySelector('#btnNext')
             .addEventListener('click',()=>{
                 console.log(data.descripciones.length);
-                (this.positionMarker==0||this.positionMarker<(Object.keys( this.positions.positionsAll).length-1))?this.positionMarker++:console.log('tope');
+                (this.positionMarker==0||this.positionMarker<(Object.keys( this.positions.getPositions).length-1))?this.positionMarker++:console.log('tope');
                 this.routeAnimation(this.positionMarker); 
                 
             });
@@ -411,11 +457,19 @@ export default class Experience{
                 //cerrar descripcion y reposicionar camara
                 this.movePosition(this.cameraDefault.position,this.controls.target);
                 this.switchDecoration('C');
+                document.querySelector('.modal_shadow').classList.replace('modalB','modalA');
+                
+            });
+            //events modal view
+            document.querySelector('.modal_shadow')
+            .addEventListener('click',()=>{
+                this.movePosition(this.cameraDefault.position,this.controls.target);
+                this.switchDecoration('C');
             });
         }
 
         routeAnimation(i){
-            let positions = this.positions.positionsAll;
+            let positions = this.positions.getPositions;
             let positionValues = Object.values(positions);
             let positionsKeys = Object.keys(positions);
             
@@ -452,11 +506,14 @@ export default class Experience{
             let boxBtnDirections = document.querySelector('.btn_directions');
             let panelBienvenida = document.querySelector('.panel_Bienvenida');
             let boxAuxBtns = document.querySelector('.aux_btns');
+            let modal_shadow = document.querySelector('.modal_shadow');
+            modal_shadow.classList.replace('modalA','modalB');
             switch (pos) {
                 case 'A':
                     panelAndante.classList.replace('posB','posA');
                     boxBtnDirections.classList.replace('posBtnB','posBtnA');
                     boxAuxBtns.classList.replace('auxB','auxA');
+                    modal_shadow.classList.replace('modalA','modalB');
                     break;
                 case 'B': 
                     panelAndante.style.display = 'block';
@@ -464,13 +521,17 @@ export default class Experience{
                     panelAndante.classList.replace('posA','posB');
                     boxBtnDirections.classList.replace('posBtnA','posBtnB');
                     boxAuxBtns.classList.replace('auxA','auxB');
+                    modal_shadow.classList.replace('modalB','modalA');      
+
                     break;
                 case 'C':
                     panelDescripcion.style.display = 'none';
                     panelAndante.style.display = 'none';
+                    modal_shadow.classList.replace('modalB','modalA');
                     break;
                 default:
-                    panelBienvenida.style.display  = 'none';       
+                    panelBienvenida.style.display  = 'none'; 
+                    modal_shadow.classList.replace('modalB','modalA');      
                     break;
             }
         }

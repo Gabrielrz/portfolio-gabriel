@@ -15,4 +15,27 @@ NOTA: el servidor de github tarda en recargar el proyecto
 (lo mejor es hacerlo manualmente en la seccion de paginas en las opciones que aparecen alado del enlace)
 
 
+LOD 29-05-2023
 
+el lod es como un contenedor de objetos en mayor o menor calidad que cambia automaticamente dependiendo
+de la distancia de la camara.
+
+los eventos no es necesario aplicarlo a cada uno de los objetos gltf que estan contenidos en el LOD
+ya que poseen el mismo nombre y referencia por que son clones solo es necesario aplicar los eventos a un objeto una sola vez.
+
+en cambio todo lo que es visual como las imagenes si que tienen que aplicarse a cada objeto
+
+*actualizacion 29-05-2023
+debido a su complejidad se ha decidido aplicar los eventos a cada objeto de la lod , significa
+que los eventos se llamaran al mismo tiempo por cada objeto, es decir 3 veces cada evento de click ya que son clones exactos.
+solucionar****
+(solucion parche)
+se puede detener los eventos repetidos con stopPropagation de la clase interactionManager,
+ pero interrumpira los demas eventos, es decir el evento focus de la pantalla y el evento click de la pantalla 
+ no pueden convivir por que si se activa uno el otro no lo hara
+
+ (aclaracion)
+ los eventos de foco, cuando se hace click en un objeto, el listener no sabe que objeto se clica solo su id de referencia
+ y al ser todos iguales, se aplica las animaciones y continua, en el caso de la screen al no saber
+ en que momento cambia el objeto debido a la LOD hay que borrar el interactionManager e instanciarlo para que 
+ tome como referencia el actual objeto.

@@ -97,7 +97,7 @@ header{
   width: 100%;
   height: 80px;
   background: var(--color-header-opacity);
-  z-index: 1;
+  z-index: 2;
 }
 
 .box_content main{
@@ -217,7 +217,6 @@ nav ul.items{
 
   list-style-type: none;
   padding: 20px;
-  border: 1px solid red;
   position: relative;
   top: 70px;
   left: 20px;  
@@ -229,6 +228,8 @@ nav .items li {
   text-align: center;
  
   border-bottom: 3px solid black;
+  border-radius: 1px;
+  
   margin: 0;
   padding: 10px;
 
@@ -247,7 +248,6 @@ nav .items a {
 .wondererContainer{ 
   /*posicion inicial relativa en wonderContainer debido a posA en animateBack*/
   display: none;
-  border: 1px solid red;
   
 }
 
@@ -381,7 +381,7 @@ nav .items a {
  /* border: 1px solid red;*/
 }
 
-.body_description .box_btns_desc button{
+.body_description .box_btns_desc .buttonLink{
  
   font-size: 22px;
   border-radius: 10px;
@@ -391,19 +391,32 @@ nav .items a {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   border: none;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+  
 }
 
-.body_description .box_btns_desc button:nth-child(1){
+.body_description .box_btns_desc a:nth-child(1){
   padding: 10px 15px;
   margin-right: 2px;
 }
-
-.body_description .box_btns_desc button:nth-child(2){
-  width: 200px;
+.body_description .box_btns_desc i{
+  font-size: 24px;
+  padding: 0px 8px;
+  color: whitesmoke;
+}
+.body_description .box_btns_desc a:nth-child(2){
+  text-decoration: none;
+  
+  padding: 10px 30px;
+  margin-left: 2px;
+  
+}
+.body_description .box_btns_desc a:nth-child(3){
+  text-decoration: none;
   padding: 10px 30px;
   margin-left: 2px;
 }
-
 /*button directions*/
 
 
@@ -471,6 +484,7 @@ nav .items a {
 }
 .wondererContainer .aux_btns button i{
   filter: drop-shadow(3px 6px 6px rgba(0, 0, 0, 0.20));
+  
 }
 .wondererContainer .aux_btns .boxBtnClose{
   position: absolute;
@@ -501,8 +515,9 @@ nav .items a {
 }
 
 
+/** next code its call from js @method: switchDecoration*/
 
-/**call from js @method: switchDecoration*/
+
 .wondererContainer .aux_btns.auxB .boxBtnClose button:nth-child(1){
   /*no es necesario llamar desde js, es toggle automatico cuando llama a auxB */
   float: none;
@@ -520,8 +535,10 @@ nav .items a {
 }
 /**fin buttons directions*/
 
+/*end call js*/
 
-/*contenedeor de sombra modal no en uso*/
+
+/*contenedeor de sombra modal  en uso*/
 .modal_shadow{
 border: 1px solid black;
 position: absolute;
@@ -529,13 +546,24 @@ top: calc(0px - 200px);/*200 main*/
 left: calc(0px - 50px);
 width: 100vw;
 height: 100vh;
-display: none;
-background: rgba(255, 255, 255, 0.001);
-backdrop-filter: blur(2px);
-z-index: 2;
+background: url('/src/images/background_shadow_linear.png');
+animation: fadeIn .5s ease 0s 1 normal forwards;
 }
-
-
+.modal_shadow.modalA{/*auxiliar active in js */
+  display: none;
+}
+.modal_shadow.modalB{/*auxiliar active in js */
+  display: block;
+  
+}
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 
 /*layout movil*/
 @media only screen and (max-width:768px) {
@@ -615,7 +643,7 @@ main .panel_Bienvenida{
 
 /*Menu horizontal movil*/
 header{
-  height: 70px;
+  height: 60px;
   background: var(--color-blue-light);
 }
 #navButton{
@@ -624,7 +652,7 @@ header{
   background: var(--color-blue-light);
   text-align: center;
   padding: 6px 10px;
-  margin-top: 15px;
+  margin-top: 10px;
   margin-left: 0;
   margin-right: 10px;
   cursor: pointer;
@@ -848,7 +876,7 @@ nav .items a {
 
 }
 
-.body_description .box_btns_desc button{
+.body_description .box_btns_desc .buttonLink{
  
   border-radius: 10px;
   background: var(--color-blue-light);
@@ -858,14 +886,15 @@ nav .items a {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   border: none;
   cursor: pointer;
+ 
 }
 
-.body_description .box_btns_desc button:nth-child(1){
+.body_description .box_btns_desc a:nth-child(1){
   padding: 8px 12px;
   margin-right: 2px;
 }
 
-.body_description .box_btns_desc button:nth-child(2){
+.body_description .box_btns_desc a:nth-child(2){
   width:auto;
   padding: 8px 18px;
   margin-left: 2px;
@@ -988,7 +1017,33 @@ nav .items a {
 /**fin buttons directions*/
 
 
-
+/*contenedeor de sombra modal  en uso movil*/
+.modal_shadow{
+  border: 1px solid black;
+  position: absolute;
+  top: calc(0px - 400px);/*200 main*/
+  left: calc(0px - 0px);
+  width: 100vw;
+  height: 100vh;
+  background: url('/src/images/background_shadow_movil.png');
+  animation: fadeIn .5s ease 0s 1 normal forwards;
+  }
+  .modal_shadow.modalA{/*auxiliar active in js */
+    opacity: 0;
+    display: none;
+  }
+  .modal_shadow.modalB{/*auxiliar active in js */
+    display: block;
+    opacity: 1;
+  }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 
 
 }
