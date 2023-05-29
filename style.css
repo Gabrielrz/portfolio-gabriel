@@ -764,7 +764,7 @@ nav .items a {
   animation: animateNext 1s ease 0s 1 normal forwards;
 }
 
-/*animacion de expancion junto con posicion*/
+/*animacion de expancion junto con reposicionamiento de botones auxiliares*/
 @keyframes animateNext {
 
   0% {
@@ -799,7 +799,7 @@ nav .items a {
 
 	100% {
     position: absolute;   
-    top:calc(90vh - 400px);/*(-400) de main*/
+    top:calc(85vh - 400px);/*(-400) de main*/
     left: calc(50% - 22%);/*-22& =  40% width/2 + 2 margen*/
     width: 40%;
     margin: auto;
@@ -882,13 +882,17 @@ nav .items a {
   background: var(--color-blue-light);
   color: white;
   font-family: "Nonito-Bold",sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   border: none;
   cursor: pointer;
  
 }
-
+.body_description .box_btns_desc i{
+  font-size: 13px;
+  padding: 0px 8px;
+  color: whitesmoke;
+}
 .body_description .box_btns_desc a:nth-child(1){
   padding: 8px 12px;
   margin-right: 2px;
@@ -900,6 +904,11 @@ nav .items a {
   margin-left: 2px;
 }
 
+.body_description .box_btns_desc a:nth-child(3){
+  text-decoration: none;
+  padding: 8px 18px;
+  margin-left: 2px;
+}
 /*button directions*/
 
 .wondererContainer .btn_directions{
