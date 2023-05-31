@@ -39,3 +39,8 @@ se puede detener los eventos repetidos con stopPropagation de la clase interacti
  y al ser todos iguales, se aplica las animaciones y continua, en el caso de la screen al no saber
  en que momento cambia el objeto debido a la LOD hay que borrar el interactionManager e instanciarlo para que 
  tome como referencia el actual objeto.
+
+ 31-05-23 compresion. gltf
+
+ para la compresion del gltf utilize gltfpack, ten cuidado con las texturas por que al cambiarlas dinamicamente tienen que ser exactamente 
+ a las comprimidas, con los mismos valores offset y repeat.

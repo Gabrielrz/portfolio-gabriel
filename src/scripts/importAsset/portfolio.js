@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import LodL from '../performance/levelOfDetail';
+
+//import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';//mobile
+
 export default class PortfolioGTLF{
 
     constructor(scene,url){
@@ -16,6 +19,7 @@ export default class PortfolioGTLF{
 			this.dracoLoader.setDecoderPath('jsm/libs/draco/');
 			
 			this.loader = new GLTFLoader(this.loadingManager);
+			//this.loader.setMeshoptDecoder(MeshoptDecoder);
 			this.loader.setDRACOLoader( this.dracoLoader );
 			this.mixer;
 			this.load();
@@ -42,6 +46,7 @@ export default class PortfolioGTLF{
 				//this.clip = THREE.AnimationClip.findByName( gltf.animations, "CameraAction" ) 
 
 				resolve(gltf);
+				console.log(gltf);
 		
 
 			});
