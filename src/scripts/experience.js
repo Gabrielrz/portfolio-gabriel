@@ -14,12 +14,11 @@ import { gsap } from "gsap";
 import Positions from './importAsset/positions';
 import Background from './background';
 import { InteractionManager } from 'three.interactive';
-
 //imagenes textura screen
 import info_default from '/src/images/info_default.png';
 import info_screen1 from '/src/images/info_screen1.png';
 import info_screen2 from '/src/images/info_screen2.png';
-import glt_url from  '/src/assets/museum6.gltf?url'
+import glt_url from  '/src/assets/museumOptimized7.gltf?url'
 export default class Experience{
 
     constructor(canvas){
@@ -90,7 +89,7 @@ export default class Experience{
             let distance = this.lodL.levels[lodL.lod.getCurrentLevel()];
             let currentObject = this.lodL.lod.getObjectForDistance(distance);
             
-            this.screenMesh =  currentObject.getObjectByName('screen');
+            this.screenMesh =  currentObject.getObjectByName('mesh_30');
             this.improveRotulo(this.screenMesh);
             this.loadInteractionRotulo(this.screenMesh);
 
@@ -238,16 +237,24 @@ export default class Experience{
         var tz = new THREE.TextureLoader().load( info_default );
         let tx = new THREE.TextureLoader().load( info_screen1 );
         let ts = new THREE.TextureLoader().load( info_screen2 );
-        
-				
+       
+
         tx.flipY=false; ts.flipY=false; tz.flipY=false;
-        this.materials.push(new THREE.MeshBasicMaterial( {map:tz }));
+        this.materials.push(new THREE.MeshBasicMaterial( {map:tz}));
         this.materials.push(new THREE.MeshBasicMaterial( { map: tx } ));
         this.materials.push(new THREE.MeshBasicMaterial( {map:ts }));
-        screenMesh.material = this.materials[0];
+        
+        this.materials.forEach(element => {//replica posiciones gltf comprimido
+            element.map.repeat.copy(screenMesh.material.map.repeat);
+            element.map.offset.copy(screenMesh.material.map.offset);
+            element.map.needsUpdate = true;
+        });
+      
+       screenMesh.material = this.materials[0];
+       screenMesh.material.needsUpdate = true;
 
+        
 
-        console.log(this.materials);
  
         //mallas de eventos
         this.signHitBoxes = new THREE.Group()
