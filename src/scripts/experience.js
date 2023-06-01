@@ -9,17 +9,17 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import PortfolioGTLF from './importAsset/portfolio';
 import Sizes from './sizes';
-import data from "../assets/json/data_portafolio.json";
+import data from '/src/data/data_portafolio.json';
 import { gsap } from "gsap";
-import Positions from './importAsset/positions';
+import Positions from './positions';
 import Background from './background';
 import { InteractionManager } from 'three.interactive';
 //imagenes textura screen
-import info_default from '/src/images/info_default.png';
-import info_screen1 from '/src/images/info_screen1.png';
-import info_screen2 from '/src/images/info_screen2.png';
-import glt_url from  '/src/assets/museumOptimized7.gltf?url';
-import gltf_bin from  '/src/assets/museumOptimized7.bin?url';
+import info_default from '/src/assets/images/info_default.png';
+import info_screen1 from '/src/assets/images/info_screen1.png';
+import info_screen2 from '/src/assets/images/info_screen2.png';
+import glt_url from  '/src/assets/models/museumOptimized7.gltf?url';
+import gltf_bin from  '/src/assets/models/museumOptimized7.bin?url';
 
 export default class Experience{
 
@@ -48,8 +48,8 @@ export default class Experience{
 
             //interaction manager
             this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
-            
-            this.btnActiveMenu();
+            this.sizes.onResize(this.renderer,this.camera);
+            this.setMenu();
             this.btnWelcomeContinue();
             this.eventsBtnsAuxiliar();
             //this.btnNexBackAuxiliary();
@@ -65,7 +65,7 @@ export default class Experience{
                
                 
                 this.buildControls();
-                this.sizes.onResize(this.renderer,this.camera);
+                
                 
                 this.animate();
                 
@@ -417,13 +417,38 @@ export default class Experience{
         }
 
 
-        btnActiveMenu(){
+        setMenu(){
            let btn = document.querySelector("#navButton");
            let nav = document.querySelector("nav");
+           let btnInicio =  document.querySelector('#inicio');
+           let btnSobreMi = document.querySelector('#sobreMi');
+           let btnContacto  = document.querySelector('#contacto');
+           let keys = Object.keys(this.positions.getPositions);
+            function toggleMenu(){//funcion anonima
+                btn.classList.toggle('navButtonClose'); 
+                document.querySelector('.box_btn').classList.toggle('active');//aplica estilo a btn close
+                nav.style.display = (nav.style.display === 'none')? 'block' : 'none';
+            }
+
            btn.addEventListener("click",(e)=>{
-                  btn.classList.toggle('navButtonClose'); 
-                  document.querySelector('.box_btn').classList.toggle('active');//aplica estilo a parent
-                  nav.style.display = (nav.style.display === 'none')? 'block' : 'none';
+                toggleMenu();
+            });
+            btnInicio.addEventListener('click',()=>{
+                  //reposiciona a la posicion inicial bienvenida
+                  let positions = this.positions;
+                  let pCamera = positions.positionInitialMuseum.camera;
+                  let pControl = positions.positionInitialMuseum.control;
+                  this.movePosition(pCamera,pControl);
+                  this.switchDecoration('D');
+                  toggleMenu();
+            });
+            btnSobreMi.addEventListener('click',()=>{
+                this.routeAnimation(keys.indexOf('Pantalla'));//pantalla
+                toggleMenu();
+            }); 
+            btnContacto.addEventListener('click',()=>{
+                let mail = data.SocialNetworks.contacto;
+                document.location = "mailto:"+mail;
             });
         }
 
@@ -500,7 +525,7 @@ export default class Experience{
                 this.movePosition(posCamera,posControl);
                 console.log("Redes"); 
 
-            } else{
+            }else{
                 //switch A
                this.switchDecoration('A');
                 
@@ -523,6 +548,7 @@ export default class Experience{
                     boxBtnDirections.classList.replace('posBtnB','posBtnA');
                     boxAuxBtns.classList.replace('auxB','auxA');
                     modal_shadow.classList.replace('modalA','modalB');
+                    panelBienvenida.style.display  = 'none'; 
                     break;
                 case 'B': 
                     panelAndante.style.display = 'block';
@@ -530,10 +556,19 @@ export default class Experience{
                     panelAndante.classList.replace('posA','posB');
                     boxBtnDirections.classList.replace('posBtnA','posBtnB');
                     boxAuxBtns.classList.replace('auxA','auxB');
-                    modal_shadow.classList.replace('modalB','modalA');      
+                    modal_shadow.classList.replace('modalB','modalA');
+                    panelBienvenida.style.display  = 'none';
 
                     break;
                 case 'C':
+                    panelDescripcion.style.display = 'none';
+                    panelAndante.style.display = 'none';
+                    modal_shadow.classList.replace('modalB','modalA');
+                    panelBienvenida.style.display  = 'none';
+                    break;
+                case 'D'://panel bienvenida
+                    panelBienvenida.style.display  = 'block'; 
+                    panelDescripcion.style.display = 'none';
                     panelDescripcion.style.display = 'none';
                     panelAndante.style.display = 'none';
                     modal_shadow.classList.replace('modalB','modalA');

@@ -546,7 +546,7 @@ top: calc(0px - 200px);/*200 main*/
 left: calc(0px - 50px);
 width: 100vw;
 height: 100vh;
-background: url('/src/images/background_shadow_linear.png');
+background: url('/src/assets/images/background_shadow_linear.png');
 animation: fadeIn .5s ease 0s 1 normal forwards;
 }
 .modal_shadow.modalA{/*auxiliar active in js */
@@ -1034,7 +1034,7 @@ nav .items a {
   left: calc(0px - 0px);
   width: 100vw;
   height: 100vh;
-  background: url('/src/images/background_shadow_movil.png');
+  background: url('/src/assets/images/background_shadow_movil.png');
   animation: fadeIn .5s ease 0s 1 normal forwards;
   }
   .modal_shadow.modalA{/*auxiliar active in js */

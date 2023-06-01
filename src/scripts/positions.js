@@ -113,6 +113,7 @@ constructor(){
             }
         };
     }
+    
     get positionAllMovil(){
         return {
             Fiatec:{
