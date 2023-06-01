@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 
 import { gsap } from "gsap";
-import base from "/src/images/base.png";
+import base from "/src/assets/images/base.png";
 export default class Background{//creado con chatGPT
 
 

@@ -41,17 +41,13 @@ export default class PortfolioGTLF{
 			this.loader.load(this.url, (gltf) => {
 
 				this.model =  gltf.scene;
-				this.lodL.initLod(gltf,this.scene);
-				//this.scene.add(this.model);
+				this.lodL.initLod(gltf,this.scene);//add scene through LOD
 				this.position.copy(this.model.position);
 				this.camera = gltf.cameras[0];
 
 				const directionalLight =  this.model.children[0].children[0];
 				directionalLight.layers.toggle(1);
 				directionalLight.intensity =1.0;
-
-			
-				//this.clip = THREE.AnimationClip.findByName( gltf.animations, "CameraAction" ) 
 
 				resolve(gltf);
 				console.log(gltf);
