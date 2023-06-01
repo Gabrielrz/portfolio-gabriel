@@ -44,3 +44,19 @@ se puede detener los eventos repetidos con stopPropagation de la clase interacti
 
  para la compresion del gltf utilize gltfpack, ten cuidado con las texturas por que al cambiarlas dinamicamente tienen que ser exactamente 
  a las comprimidas, con los mismos valores offset y repeat.
+
+01-06-2023 (carga de datos .bin para objeto gltf)
+al hacer un run build y subir al servidor el comando no leia el archivo .bin que pertenece a el objeto gltf comprimido.
+por lo que no tenia una url dinamica y no estaba en el archivo dist/ assets
+lo que se hizo para resolverlo es importar desde js el archivo bin para que vite creara una url dinamica y modificar
+el cargador de gltf pasandole la ruta dinamica
+
+import gltf_bin from  '/src/assets/museumOptimized7.bin?url';
+
+this.loadingManager.setURLModifier((urls) => {
+				urls.replace('/src/assets/museumOptimized7.bin', url_bin);
+				console.log(urls);
+				return urls;
+			  });
+//tambien podia solucionarlo simplemente añadiendo el archivo bin a la carpeta dist/assets pero era demasiado facil
+y no se aplicaba la ruta dinamica.

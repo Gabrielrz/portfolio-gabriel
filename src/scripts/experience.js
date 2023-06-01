@@ -18,7 +18,9 @@ import { InteractionManager } from 'three.interactive';
 import info_default from '/src/images/info_default.png';
 import info_screen1 from '/src/images/info_screen1.png';
 import info_screen2 from '/src/images/info_screen2.png';
-import glt_url from  '/src/assets/museumOptimized7.gltf?url'
+import glt_url from  '/src/assets/museumOptimized7.gltf?url';
+import gltf_bin from  '/src/assets/museumOptimized7.bin?url';
+
 export default class Experience{
 
     constructor(canvas){
@@ -51,7 +53,7 @@ export default class Experience{
             this.btnWelcomeContinue();
             this.eventsBtnsAuxiliar();
             //this.btnNexBackAuxiliary();
-            this.model =  new PortfolioGTLF(this.scene,glt_url);
+            this.model =  new PortfolioGTLF(this.scene,glt_url,gltf_bin);
             
             this.model.prom.then((gltf)=>{
                 this.lodL = this.model.lodL;
