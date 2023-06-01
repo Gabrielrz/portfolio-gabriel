@@ -7,7 +7,7 @@ import LodL from '../performance/levelOfDetail';
 
 export default class PortfolioGTLF{
 
-    constructor(scene,url){
+    constructor(scene,url,url_bin){
 			
 			this.lodL = new LodL();
 			this.loadingManager = new THREE.LoadingManager()
@@ -19,6 +19,14 @@ export default class PortfolioGTLF{
 			this.dracoLoader.setDecoderPath('jsm/libs/draco/');
 			
 			this.loader = new GLTFLoader(this.loadingManager);
+			this.loadingManager.setURLModifier((urls) => {
+				
+				console.log("urlsbin",url_bin);
+				urls = (urls.search('museumOptimized7.bin')!=-1)?  url_bin: urls;
+				
+				console.log("urls",urls);
+				return urls;
+			  });
 			//this.loader.setMeshoptDecoder(MeshoptDecoder);
 			this.loader.setDRACOLoader( this.dracoLoader );
 			this.mixer;
