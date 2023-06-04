@@ -21,10 +21,9 @@ export default class PortfolioGTLF{
 			this.loader = new GLTFLoader(this.loadingManager);
 			this.loadingManager.setURLModifier((urls) => {
 				
-				console.log("urlsbin",url_bin);
 				urls = (urls.search('museumOptimized7.bin')!=-1)?  url_bin: urls;
 				
-				console.log("urls",urls);
+				
 				return urls;
 			  });
 			//this.loader.setMeshoptDecoder(MeshoptDecoder);
@@ -41,7 +40,8 @@ export default class PortfolioGTLF{
 			this.loader.load(this.url, (gltf) => {
 
 				this.model =  gltf.scene;
-				this.lodL.initLod(gltf,this.scene);//add scene through LOD
+				this.scene.add(this.model);//add scene normal object without lod
+				//this.lodL.initLod(gltf,this.scene);//add scene through LOD
 				this.position.copy(this.model.position);
 				this.camera = gltf.cameras[0];
 

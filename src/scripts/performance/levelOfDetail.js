@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import EventEmitter from "../utils/eventEmitter";
-
+/** LOD NO EN USO, (implementar en el futuro para cada objeto del gtld en lugar de el gltf entero) */
 export default class LodL extends EventEmitter{
     constructor(){
         super();
@@ -26,6 +26,8 @@ export default class LodL extends EventEmitter{
 		mediumQualityModel.traverse((child) => {
 		if (child.isMesh) {
 			// Ajusta los materiales, geometrías, etc., para reducir la calidad
+            console.log(child);
+            
 		}
 		});
 		this.lod.addLevel(mediumQualityModel, this.levels[1]);
@@ -35,6 +37,7 @@ export default class LodL extends EventEmitter{
 		lowQualityModel.traverse((child) => {
 		if (child.isMesh) {
 			// Ajusta los materiales, geometrías, etc., para reducir la calidad aún más
+            child.castShadow = false;
 		}
 		});
 		this.lod.addLevel(lowQualityModel, this.levels[2]);

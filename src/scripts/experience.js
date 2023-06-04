@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 
-
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import PortfolioGTLF from './importAsset/portfolio';
 import Sizes from './sizes';
@@ -18,6 +18,10 @@ import { InteractionManager } from 'three.interactive';
 import info_default from '/src/assets/images/info_default.png';
 import info_screen1 from '/src/assets/images/info_screen1.png';
 import info_screen2 from '/src/assets/images/info_screen2.png';
+
+import info_screen1_movil from '/src/assets/images/info_screen1_movil.png';
+import info_screen2_movil from '/src/assets/images/info_screen2_movil.png';
+import info_screen3_movil from '/src/assets/images/info_screen3_movil.png';
 import glt_url from  '/src/assets/models/museumOptimized7.gltf?url';
 import gltf_bin from  '/src/assets/models/museumOptimized7.bin?url';
 
@@ -33,7 +37,7 @@ export default class Experience{
 
             this.clock = new THREE.Clock();
            
-            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true,powerPreference: 'high-performance'});
+            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true, powerPreference: 'high-performance'});
             this.renderer.outputEncoding = THREE.sRGBEncoding;
             
             this.renderer.setSize( this.sizes.width, this.sizes.height );
@@ -41,7 +45,7 @@ export default class Experience{
 
             this.background = new Background(this.scene);
            
-            this.camera = new THREE.PerspectiveCamera( 45, this.sizes.aspect, 1, 1000 );
+            this.camera = new THREE.PerspectiveCamera( this.sizes.getFov , this.sizes.aspect, 1, 1000 );
             const initPosC = this.positions.positionInitialMuseum.camera;
             this.camera.position.set(initPosC.x,initPosC.y,initPosC.z );
 
@@ -52,14 +56,16 @@ export default class Experience{
             this.setMenu();
             this.btnWelcomeContinue();
             this.eventsBtnsAuxiliar();
-            //this.btnNexBackAuxiliary();
             this.model =  new PortfolioGTLF(this.scene,glt_url,gltf_bin);
             
+
+            this.stats = new Stats()
+            document.body.appendChild(this.stats.dom)
+
             this.model.prom.then((gltf)=>{
                 this.lodL = this.model.lodL;
-                this.eventLod(this.lodL);
-                this.cameraDefault = gltf.cameras[0];
-               
+                //this.exchangetLod(this.lodL);(no en uso por mejora)
+               this.insteadOfLod(gltf.scene);
                
                 
                
@@ -74,17 +80,19 @@ export default class Experience{
 
             
     }
-    /**
-     * @description este metodo recorre los objetos contenidos dentro 
-     * de el objeto LOD y aplica los eventos a todos ellos a la vez.
-     * @warning los eventos se llamaran al mismo tiempo 
-     * independientemente del nivel de detalle actual y el objeto actual(solucionar en el futuro)
+    /**NO EN USO
+     * @description este metodo busca los objetos contenidos dentro 
+     * de el objeto LOD y re-aplica los eventos a todos ellos a la vez.
+     * @warning al llamara a un evento, se llamaran a todos los eventos
+     *  de todos los niveles del lod por que tienen la misma referencia
+     * (solucionar en el futuro(en lugar stopPropagation))
      * @method on es llamado cada vez que el nivel de detalle cambia.
      * @param {*} lodL recibe un objeto de la clase Lodl
      */
-    eventLod(lodL){
-    
+    exchangetLod(lodL){
+       
         lodL.on('level_changed',(e)=>{
+            
             this.interactionManager.dispose();
             this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
 
@@ -93,14 +101,43 @@ export default class Experience{
             
             this.screenMesh =  currentObject.getObjectByName('mesh_30');
             this.improveRotulo(this.screenMesh);
-            this.loadInteractionRotulo(this.screenMesh);
+            this.eventsRotulo(this.screenMesh);
 
             this.elements = this.buscarObjetosPorUserData(currentObject,'focus',true);    
             this.eventsFocusElement(this.elements);
-
+            
+            
             console.log('cambio de LOD');
         });
     }
+
+    /**
+     * @description : metodo que llama a los mismo metodos de 
+     * la funcion exchangeLod pero aplicados al objeto gltf original sin lod
+     *  en sustitucion de exchangeLod
+     * */
+    insteadOfLod(currentObject){
+            this.interactionManager.dispose();
+            this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
+
+            //pantalla de rotulo
+            this.screenMesh =  currentObject.getObjectByName('mesh_30');
+            this.improveRotulo(this.screenMesh);
+            this.eventsRotulo(this.screenMesh);
+
+            //objetos clickables
+            this.elements = this.buscarObjetosPorUserData(currentObject,'focus',true);    
+            this.eventsFocusElement(this.elements);
+
+            //botones de redes sociales
+            this.buttons = [];
+            this.buttons.push(currentObject.getObjectByName('buttton1'));
+            this.buttons.push(currentObject.getObjectByName('button2'));
+            this.buttons.push(currentObject.getObjectByName('button3'));
+            this.eventsSocialNetwork(this.buttons);
+            
+    }
+
     animate() {
         
         requestAnimationFrame( this.animate.bind(this) );
@@ -115,9 +152,10 @@ export default class Experience{
     render(){
         this.controls.update();
         this.interactionManager.update();
-        this.lodL.lod.update(this.camera);
-        this.lodL.checkLODLevel(this.camera);
+        //this.lodL.checkLODLevel(this.camera);
         this.renderer.render( this.scene, this.camera );
+        this.stats.update();
+        
     }
 
 
@@ -159,16 +197,13 @@ export default class Experience{
         }
     }
 
-    loadInteractionRotulo(object){/*interacion para rotulo */
-          
-          this.interactionManager.add(object);
-          this.eventsRotulo(object);
-         
-    }
+   
 
 
     eventsRotulo(screenMesh){
         let i = 1;
+        this.interactionManager.add(screenMesh);
+        
        screenMesh.addEventListener('mouseover',()=>{
             document.body.style.cursor = 'pointer';
         });
@@ -180,7 +215,7 @@ export default class Experience{
             //event.stopPropagation();
            
             //i empieza en 1
-            (i>=3)? window.open('https://github.com/Gabrielrz/portfolio-gabriel',i=0) : console.log('menor');//cambiar por mesh
+            (i>=this.materials.length)? window.open('https://github.com/Gabrielrz/portfolio-gabriel',i=0) : console.log('menor');//cambiar por mesh
             (i < this.materials.length) ? (screenMesh.material = this.materials[i], i++) : console.log('stopscreen');
         });
     }
@@ -205,10 +240,30 @@ export default class Experience{
             });
         });
        
-        
-        
-        //
+    }
 
+
+    eventsSocialNetwork(buttons){
+        console.log(buttons);
+        buttons.forEach(button => {
+            this.interactionManager.add(button);    
+            button.addEventListener('click',(event)=>{
+                event.stopPropagation();
+                
+                if(button.name =='buttton1'){
+                    window.open(data.socialNetworks.urlInstagram);
+                }
+                if(button.name == 'button2'){
+                    window.open(data.socialNetworks.urlGithub);
+
+                }
+                if(button.name == 'button3'){
+                    window.open(data.socialNetworks.urlLinkeddin);
+
+                }
+            });
+        });
+       
     }
 
 
@@ -236,16 +291,27 @@ export default class Experience{
 
     improveRotulo(screenMesh){
         this.materials = [];
-        var tz = new THREE.TextureLoader().load( info_default );
-        let tx = new THREE.TextureLoader().load( info_screen1 );
-        let ts = new THREE.TextureLoader().load( info_screen2 );
-       
+        const textureLoader = new THREE.TextureLoader();
+        const textures = {
+            default: textureLoader.load(info_default),
+            tx: this.sizes.isMovil ? textureLoader.load(info_screen1_movil) : textureLoader.load(info_screen1),
+            ts: this.sizes.isMovil ? textureLoader.load(info_screen2_movil) : textureLoader.load(info_screen2)
+        };
 
-        tx.flipY=false; ts.flipY=false; tz.flipY=false;
-        this.materials.push(new THREE.MeshBasicMaterial( {map:tz}));
-        this.materials.push(new THREE.MeshBasicMaterial( { map: tx } ));
-        this.materials.push(new THREE.MeshBasicMaterial( {map:ts }));
-        
+        textures.default.flipY = false;
+        textures.tx.flipY = false;
+        textures.ts.flipY = false;
+
+        this.materials.push(new THREE.MeshBasicMaterial({ map: textures.default }));
+        this.materials.push(new THREE.MeshBasicMaterial({ map: textures.tx }));
+        this.materials.push(new THREE.MeshBasicMaterial({ map: textures.ts }));
+
+        if (this.sizes.isMovil) {
+            const tc = textureLoader.load(info_screen3_movil);
+            tc.flipY = false;
+            this.materials.push(new THREE.MeshBasicMaterial({ map: tc }));
+        }
+            
         this.materials.forEach(element => {//replica posiciones gltf comprimido
             element.map.repeat.copy(screenMesh.material.map.repeat);
             element.map.offset.copy(screenMesh.material.map.offset);
@@ -273,10 +339,11 @@ export default class Experience{
 
 
     animationInitial(positions){
-        var master = gsap.timeline({ onComplete:()=>{this.rotateCamera()}});
+       
+        let master = gsap.timeline({repeatDelay: 1,onComplete:()=>{this.rotateCamera()}});
         master.add(this.movePositionAnim(positions.pA.camera,positions.pA.control))     
-        .add(this.movePositionAnim(positions.pB.camera,positions.pB.control), "-=1")
-        .add(this.movePositionAnim(positions.pC.camera,positions.pC.control), "-=1")
+        .add(this.movePositionAnim(positions.pB.camera,positions.pB.control),'-=1')
+        .add(this.movePositionAnim(positions.pC.camera,positions.pC.control),'-=2')
     }
 
     rotateCamera(){
@@ -289,7 +356,7 @@ export default class Experience{
                 return 10 * Math.sin(-performance.now() * 0.0003);
             },
             repeatRefresh:true,
-            ease:"linear",
+            ease:"sine.out",
             duration:1.5,
             onUpdate:()=>{
                 this.camera.lookAt( this.scene.position );
@@ -308,13 +375,13 @@ export default class Experience{
          * para la camara (@param this.controls.object.position)
          * y otra para controles (@param this.controls.target)
          */
-        movePosition(pCamera,pControls){
+        movePosition(pCamera,pControls,ease='back.out(1.7)'){
             gsap.to(this.controls.object.position,{
                 x:pCamera.x,
                 y:pCamera.y,
                 z:pCamera.z,
                 duration:1,
-                ease: 'linear',
+                ease: ease,
                     onUpdate:()=>{
                         this.camera.lookAt(pControls.x,pControls.y,pControls.z);     
                     }
@@ -324,7 +391,7 @@ export default class Experience{
                 y:pControls.y,
                 z:pControls.z,
                 duration:1,
-                ease: 'linear',
+                ease: ease,
                     onUpdate:()=>{
                         this.controls.update();
                     },
@@ -340,24 +407,28 @@ export default class Experience{
          * @returns tl gsap timeline
          */
         movePositionAnim(pCamera,pControls){
-        var tl = gsap.timeline({ repeatDelay: 1});
+        let tl = gsap.timeline();
             tl.to(this.controls.object.position,{
                 x:pCamera.x,
                 y:pCamera.y,
                 z:pCamera.z,
-                duration:1.5,
-                ease: 'power2.inOut',
+                duration:1,
+                ease:'sine.out',
                     onUpdate:()=>{
-                        this.camera.lookAt(pControls.x,pControls.y,pControls.z);     
+                        this.lodL.lod.update(this.camera);
+                        this.camera.lookAt(pControls.x,pControls.y,pControls.z);
+                        
                     }
             });
             tl.to(this.controls.target,{
                 x:pControls.x,
                 y:pControls.y,
                 z:pControls.z,
-                duration:1,
-                ease: 'power2.inOut',
+                duration:2,
+                ease:'sine.out',
                     onUpdate:()=>{
+                        
+                        this.lodL.lod.update(this.camera);
                         this.controls.update();
                     },
                     onComplete:()=>{
@@ -447,7 +518,7 @@ export default class Experience{
                 toggleMenu();
             }); 
             btnContacto.addEventListener('click',()=>{
-                let mail = data.SocialNetworks.contacto;
+                let mail = data.socialNetworks.contacto;
                 document.location = "mailto:"+mail;
             });
         }
@@ -473,7 +544,7 @@ export default class Experience{
          * (distinge entre mayusculas y minusc)
          */
         eventsBtnsAuxiliar(){
-            
+           
             document.querySelector('#btnBack')
             .addEventListener('click',()=>{
                 (this.positionMarker>0)?this.positionMarker--:console.log('tope');
@@ -489,7 +560,7 @@ export default class Experience{
             document.querySelector('#btnClose')
             .addEventListener('click',()=>{
                 //cerrar descripcion y reposicionar camara
-                this.movePosition(this.cameraDefault.position,this.controls.target);
+                this.movePosition(this.positions.positionDefault.camera,this.positions.positionDefault.control,'back.out(1)');
                 this.switchDecoration('C');
                 document.querySelector('.modal_shadow').classList.replace('modalB','modalA');
                 
@@ -497,7 +568,8 @@ export default class Experience{
             //events modal view
             document.querySelector('.modal_shadow')
             .addEventListener('click',()=>{
-                this.movePosition(this.cameraDefault.position,this.controls.target);
+                
+                this.movePosition(this.positions.positionDefault.camera,this.positions.positionDefault.control);
                 this.switchDecoration('C');
             });
         }
@@ -527,8 +599,7 @@ export default class Experience{
 
             }else{
                 //switch A
-               this.switchDecoration('A');
-                
+                this.switchDecoration('A');
                 this.movePosition(posCamera,posControl);
                 this.setDescriptions(data.descripciones.find(e => e.titulo==name));
             }
