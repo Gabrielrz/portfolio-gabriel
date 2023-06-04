@@ -6,6 +6,7 @@ export default class Positions{
 
 
 constructor(){
+    this.isMovil = (window.innerWidth<=767)? true : false;
     this.positionCameraFiatec = new THREE.Vector3();
     this.positionCameraGlapp = new THREE.Vector3();
     this.positionCameraSandfirg = new THREE.Vector3();
@@ -31,8 +32,9 @@ constructor(){
     this.initPositionRedesSociales();
 }
 
+
     get getPositions(){
-        return (window.innerWidth>=600)? this.positionsAll : this.positionAllMovil;
+        return (this.isMovil)? this.positionAllMovil : this.positionsAll;
     }
 
     get positionsAll(){
@@ -94,40 +96,61 @@ constructor(){
      * @description: retorna posiciones de objeto gltf de ordenador o de movil
      */
     get positionInitialMuseum(){
-        return (window.innerWidth>=600)?
+        return (this.isMovil)?
         {
+            camera:{
+           
+                x: -58.66997689380321, y: 35.203802463231, z: -64.25216396773303
+            },
+            control:{
+                x: 8.467392886100287, y: 7.5, z: 4.176636347739419
+            }
+            
+        } : {    
             camera:{
                 x: -39.19049539144472, y:7.5000000000000036,z: -37.552257315714535
             },
             control:{
                 x:6.399150639907137,y: 7.5,z: -3.7418137048768547
             } 
-            
-        } : { 
-
-            camera:{
-            x: -103.66427249342819, y: 53.77040755423119, z: -110.11195308143499
-            },
-            control:{
-                x: 8.467392886100287, y: 7.5, z: 4.176636347739419
-            }
         };
     }
     
+
+    get positionDefault(){
+
+        return (this.isMovil)?
+        {
+            camera:{
+                x: -9.491112661872162, y: 5.123831549763967, z: -17.613935912088778
+            },
+            control:{
+                x: 11.648782, y: 1.998031, z: -2.282084
+            }
+        } : { 
+            camera:{
+                x: -14.983991681674803, y: 9.874585199056833, z: -15.320982876944957
+             },
+             control:{
+                 x: -0.8500769951997256, y: 2.943265, z: -3.7952346773503307
+             } 
+        };
+    }
+
     get positionAllMovil(){
         return {
             Fiatec:{
                 camera:{
-                    x: -11.942172749084845, y: 12.191448165656782, z: -3.9131382141501216
+                    x: -7.82146225329732, y: 7.453372451381586, z: -8.384296908944744
                 },
                 control:{
-                    x: -3.4129098925476717, y: 2.943265, z: -12.100000877649158
+                    x: -3.41291, y: 2.943265, z: -12.100001
                     
                 },
             },
             Glapp:{
                 camera:{
-                    x: 0.8139822823522103, y: 6.979840403086807, z: -6.511672007347053
+                    x: 4.190261328963036, y: 4.560462506262811, z: -8.497256253194209
                 },
                 control:{
                     x: 7.751666683483975, y: 2.008427, z: -10.59171334736046
@@ -135,7 +158,7 @@ constructor(){
             },
             Sandfirg:{
                 camera:{
-                    x: -0.45392548109826336, y: 9.492882242209003, z: -3.110757293973137
+                    x: 7.521181635431068, y: 4.505864116278992, z: -2.788970666037865
                 },
                 control:{
                     x: 11.64878244209455, y: 1.998031, z: -2.282083768777187
@@ -143,7 +166,7 @@ constructor(){
             },
             Dualad:{
                 camera:{
-                    x: 5.877284028150952, y: 7.377300112389138, z: -4.325160712738002
+                    x: 10.584763865822453, y: 4.8754621497128126, z: 3.31235518998459
                 },
                 control:{
                     x: 11.878888746471237, y: 0.800063, z: 9.722344343611086
@@ -151,7 +174,7 @@ constructor(){
             },
             Redes:{
                 camera:{
-                    x: -2.184683684343224, y: 10.769702345287126, z: 6.249299412155406
+                    x: -2.147200671964375, y: 6.585483486116932, z: 8.600024633947655
                 },
                 control:{
                     x: -2.068059827201672, y: -1.667261, z: 13.223781415932034
@@ -159,7 +182,7 @@ constructor(){
             },
             Pantalla:{
                 camera:{
-                    x: -5.1802565091106025, y: 4.130372807407822, z: -3.9571856668840892
+                    x: -11.179684026325337, y: 3.948693459214053, z: -0.7317550961237069
                 },
                 control:{
                     x: -21.405861502715073, y: 3.639016, z: 4.766074661150516
@@ -209,6 +232,8 @@ constructor(){
     getPositionControlsPuerta(){
         return this.positionControlsPuerta;
     }
+
+
 
     get mainAnimation(){
         return {
