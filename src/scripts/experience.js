@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 
-//import Stats from 'three/examples/jsm/libs/stats.module';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import PortfolioGTLF from './importAsset/portfolio';
 import Sizes from './sizes';
@@ -59,8 +59,9 @@ export default class Experience{
             this.model =  new PortfolioGTLF(this.scene,glt_url,gltf_bin);
             
 
-            //this.stats = new Stats()
-            //document.body.appendChild(this.stats.dom)
+            this.stats = new Stats()
+            this.stats.dom.style.left='50%';
+            document.body.appendChild(this.stats.dom)
 
             this.model.prom.then((gltf)=>{
                 this.lodL = this.model.lodL;
@@ -154,7 +155,7 @@ export default class Experience{
         this.interactionManager.update();
         //this.lodL.checkLODLevel(this.camera);
         this.renderer.render( this.scene, this.camera );
-        //this.stats.update();
+        this.stats.update();
         
     }
 
