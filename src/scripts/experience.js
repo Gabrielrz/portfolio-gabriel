@@ -150,7 +150,7 @@ export default class Experience{
 
     render(){
         this.controls.update();
-       
+        
         this.camera.updateMatrixWorld(true);
         this.stats.update();
       
@@ -263,14 +263,14 @@ export default class Experience{
             button.addEventListener('click',(event)=>{
                 event.stopPropagation();
                 
-                if(button.name =='buttton1'){
+                if(button.name =='buttonInstagram'){
                     window.open(data.socialNetworks.urlInstagram);
                 }
-                if(button.name == 'button2'){
+                if(button.name == 'buttonGithub'){
                     window.open(data.socialNetworks.urlGithub);
 
                 }
-                if(button.name == 'button3'){
+                if(button.name == 'buttonLinkedin'){
                     window.open(data.socialNetworks.urlLinkeddin);
 
                 }
