@@ -45,7 +45,8 @@ se puede detener los eventos repetidos con stopPropagation de la clase interacti
  para la compresion del gltf utilize gltfpack, ten cuidado con las texturas por que al cambiarlas dinamicamente tienen que ser exactamente 
  a las comprimidas, con los mismos valores offset y repeat.
  tambien ten EN CUENTA que al comprimir con gltfpack los nombres de las mallas y geometrias cambian y se anidan si se lo permite a gltfpack
-
+tambien elimina todo aquello que no se utiliza asi que si quieres por ejemplo cambiar una texrura dinamicamente, asegurate que antes 
+de comprimir utiliza el objeto una textura cualquiera
 01-06-2023 (carga de datos .bin para objeto gltf)
 al hacer un run build y subir al servidor el comando no leia el archivo .bin que pertenece a el objeto gltf comprimido.
 por lo que no tenia una url dinamica y no estaba en el archivo dist/ assets
