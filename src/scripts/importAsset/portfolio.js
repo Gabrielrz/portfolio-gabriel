@@ -16,8 +16,9 @@ export default class PortfolioGTLF{
 			this.position = new THREE.Vector3();
        		this.dracoLoader = new DRACOLoader();
 
-			this.dracoLoader.setDecoderPath('jsm/libs/draco/');
+			this.dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.4.0/");
 			
+			//console.log(this.dracoLoader);
 			this.loader = new GLTFLoader(this.loadingManager);
 			this.loadingManager.setURLModifier((urls) => {
 				
@@ -27,7 +28,9 @@ export default class PortfolioGTLF{
 				return urls;
 			  });
 			//this.loader.setMeshoptDecoder(MeshoptDecoder);
+			this.dracoLoader.preload();
 			this.loader.setDRACOLoader( this.dracoLoader );
+			
 			this.mixer;
 			this.load();
 			
@@ -40,17 +43,21 @@ export default class PortfolioGTLF{
 			this.loader.load(this.url, (gltf) => {
 
 				this.model =  gltf.scene;
+				this.model.traverse(function (child) {
+					child.frustumCulled = true;
+				  });
+				
 				this.scene.add(this.model);//add scene normal object without lod
 				//this.lodL.initLod(gltf,this.scene);//add scene through LOD
 				this.position.copy(this.model.position);
 				this.camera = gltf.cameras[0];
-
+				gltf.scene.remove(gltf.cameras[0]);
 				const directionalLight =  this.model.children[0].children[0];
 				directionalLight.layers.toggle(1);
 				directionalLight.intensity =1.0;
 
 				resolve(gltf);
-				console.log(gltf);
+				//console.log(gltf);
 		
 
 			});

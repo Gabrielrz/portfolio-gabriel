@@ -22,8 +22,9 @@ import info_screen2 from '/src/assets/images/info_screen2.png';
 import info_screen1_movil from '/src/assets/images/info_screen1_movil.png';
 import info_screen2_movil from '/src/assets/images/info_screen2_movil.png';
 import info_screen3_movil from '/src/assets/images/info_screen3_movil.png';
-import glt_url from  '/src/assets/models/museumOptimized7.gltf?url';
-import gltf_bin from  '/src/assets/models/museumOptimized7.bin?url';
+import gltf_bin from  '/src/assets/models/museum8optimized.bin?url';
+import glt_url from  '/src/assets/models/museum8optimized.gltf?url';
+
 
 export default class Experience{
 
@@ -37,18 +38,17 @@ export default class Experience{
 
             this.clock = new THREE.Clock();
            
-            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true, powerPreference: 'high-performance'});
-            this.renderer.outputEncoding = THREE.sRGBEncoding;
+            this.renderer = new THREE.WebGLRenderer({canvas:this.c,antialias:true, powerPreference: "high-performance"});
+           // this.renderer.outputEncoding = THREE.sRGBEncoding;
             
             this.renderer.setSize( this.sizes.width, this.sizes.height );
           
 
             this.background = new Background(this.scene);
            
-            this.camera = new THREE.PerspectiveCamera( this.sizes.getFov , this.sizes.aspect, 1, 1000 );
+            this.camera = new THREE.PerspectiveCamera( this.sizes.getFov , this.sizes.aspect, 1, this.sizes.far );
             const initPosC = this.positions.positionInitialMuseum.camera;
             this.camera.position.set(initPosC.x,initPosC.y,initPosC.z );
-
 
             //interaction manager
             this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
@@ -73,7 +73,7 @@ export default class Experience{
                 
                 this.buildControls();
                 
-                
+                console.log(THREE.REVISION);
                 this.animate();
                 
         
@@ -122,7 +122,7 @@ export default class Experience{
             this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
 
             //pantalla de rotulo
-            this.screenMesh =  currentObject.getObjectByName('mesh_30');
+            this.screenMesh =  currentObject.getObjectByName('mesh_16');
             this.improveRotulo(this.screenMesh);
             this.eventsRotulo(this.screenMesh);
 
@@ -132,9 +132,9 @@ export default class Experience{
 
             //botones de redes sociales
             this.buttons = [];
-            this.buttons.push(currentObject.getObjectByName('buttton1'));
-            this.buttons.push(currentObject.getObjectByName('button2'));
-            this.buttons.push(currentObject.getObjectByName('button3'));
+            this.buttons.push(currentObject.getObjectByName('buttonInstagram'));
+            this.buttons.push(currentObject.getObjectByName('buttonGithub'));
+            this.buttons.push(currentObject.getObjectByName('buttonLinkedin'));
             this.eventsSocialNetwork(this.buttons);
             
     }
@@ -144,21 +144,33 @@ export default class Experience{
         requestAnimationFrame( this.animate.bind(this) );
         
         this.render();
-        /*console.log('rotacion camara:', this.camera.rotation);
-        console.log('posicion camara:',this.camera.position);
-        console.log('ADSA0',this.controls.target);*/
-        this.time = - performance.now() * 0.0003;
+        
+        
     }
 
     render(){
         this.controls.update();
-        this.interactionManager.update();
-        //this.lodL.checkLODLevel(this.camera);
-        this.renderer.render( this.scene, this.camera );
+       
+        this.camera.updateMatrixWorld(true);
         this.stats.update();
+      
+        this.renderer.render( this.scene, this.camera );
         
+
     }
 
+    /**
+     * @description codigo comentado dentro de animate
+     */
+    trashAnimate(){
+        /*console.log('rotacion camara:', this.camera.rotation);
+        console.log('posicion camara:',this.camera.position);
+        console.log('ADSA0',this.controls.target);*/
+        //this.time = - performance.now() * 0.0003;
+        //this.interactionManager.update();
+        //this.lodL.checkLODLevel(this.camera);
+         // console.log(this.renderer.info.render);
+    }
 
 
 
@@ -213,7 +225,7 @@ export default class Experience{
             document.body.style.cursor = 'default';
           });
         screenMesh.addEventListener('click',(event)=>{
-            //event.stopPropagation();
+            event.stopPropagation();
            
             //i empieza en 1
             (i>=this.materials.length)? window.open('https://github.com/Gabrielrz/portfolio-gabriel',i=0) : console.log('menor');//cambiar por mesh
@@ -233,8 +245,8 @@ export default class Experience{
         elements.forEach(element => {
             this.interactionManager.add(element);
             element.addEventListener('click',(event)=>{
-                event.target = 'focusEvent';
                 event.stopPropagation();
+                event.target = 'focusEvent';
                 this.positionMarker = keys.indexOf(element.name);
                 this.routeAnimation(this.positionMarker)
                 console.log("llamada");
@@ -273,10 +285,11 @@ export default class Experience{
         this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         const initPos = this.positions.positionInitialMuseum.control;
         this.controls.target.set( initPos.x,initPos.y,initPos.z);
+        
         this.controls.listenToKeyEvents( window ); // optional
         this.controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
 		this.controls.dampingFactor = 0.05;
-        //this.controls.enableZoom = false;
+        this.controls.enableZoom = false;
 		this.controls.enablePan = false;
         
         this.controls.screenSpacePanning = false;
