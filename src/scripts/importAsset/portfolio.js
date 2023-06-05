@@ -22,7 +22,7 @@ export default class PortfolioGTLF{
 			this.loader = new GLTFLoader(this.loadingManager);
 			this.loadingManager.setURLModifier((urls) => {
 				
-				urls = (urls.search('museumOptimized7.bin')!=-1)?  url_bin: urls;
+				urls = (urls.search('museum8optimized.bin')!=-1)?  url_bin: urls;
 				
 				
 				return urls;
