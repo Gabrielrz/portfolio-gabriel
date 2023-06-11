@@ -26,6 +26,7 @@ import gltf_bin from  '/src/assets/models/museum8optimized.bin?url';
 import glt_url from  '/src/assets/models/museum8optimized.gltf?url';
 
 
+
 export default class Experience{
 
     constructor(canvas){
