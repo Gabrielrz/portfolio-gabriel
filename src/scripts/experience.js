@@ -247,8 +247,8 @@ export default class Experience{
             element.addEventListener('click',(event)=>{
                 event.stopPropagation();
                 event.target = 'focusEvent';
-                this.positionMarker = keys.indexOf(element.name);
-                this.routeAnimation(this.positionMarker)
+                
+                this.routeAnimation(keys.indexOf(element.name));
                 console.log("llamada");
             });
         });
@@ -377,7 +377,8 @@ export default class Experience{
                 this.controls.update();
             },
             onComplete:()=>{
-                this.routeAnimation(0);
+                this.routeAnimation(5);
+                
             }
         });
     }
@@ -524,7 +525,7 @@ export default class Experience{
                   let pCamera = positions.positionInitialMuseum.camera;
                   let pControl = positions.positionInitialMuseum.control;
                   this.movePosition(pCamera,pControl);
-                  this.switchDecoration('D');
+                  this.switchDecoration('C');
                   toggleMenu();
             });
             btnSobreMi.addEventListener('click',()=>{
@@ -567,7 +568,7 @@ export default class Experience{
             document.querySelector('#btnNext')
             .addEventListener('click',()=>{
                 console.log(data.descripciones.length);
-                (this.positionMarker==0||this.positionMarker<(Object.keys( this.positions.getPositions).length-1))?this.positionMarker++:console.log('tope');
+                (this.positionMarker==0||this.positionMarker<(Object.keys( this.positions.getPositions).length-1))?this.positionMarker++:this.positionMarker=0;
                 this.routeAnimation(this.positionMarker); 
                 
             });
@@ -575,7 +576,7 @@ export default class Experience{
             .addEventListener('click',()=>{
                 //cerrar descripcion y reposicionar camara
                 this.movePosition(this.positions.positionDefault.camera,this.positions.positionDefault.control,'back.out(1)');
-                this.switchDecoration('C');
+                this.switchDecoration();
                 document.querySelector('.modal_shadow').classList.replace('modalB','modalA');
                 
             });
@@ -584,7 +585,7 @@ export default class Experience{
             .addEventListener('click',()=>{
                 
                 this.movePosition(this.positions.positionDefault.camera,this.positions.positionDefault.control);
-                this.switchDecoration('C');
+                this.switchDecoration();
             });
         }
 
@@ -592,7 +593,7 @@ export default class Experience{
             let positions = this.positions.getPositions;
             let positionValues = Object.values(positions);
             let positionsKeys = Object.keys(positions);
-            
+            this.positionMarker = i;
                  
             
             let posCamera =  positionValues[i].camera;
@@ -619,52 +620,41 @@ export default class Experience{
             }
         }
 
-        switchDecoration(pos='B'){
-            let panelDescripcion = document.querySelector('.panel_Descripcion');
-            let panelAndante = document.querySelector('.wondererContainer');
-            let boxBtnDirections = document.querySelector('.btn_directions');
-            let panelBienvenida = document.querySelector('.panel_Bienvenida');
-            let boxAuxBtns = document.querySelector('.aux_btns');
-            let modal_shadow = document.querySelector('.modal_shadow');
-            modal_shadow.classList.replace('modalA','modalB');
+        switchDecoration(pos) {
+            const panelDescripcion = document.querySelector('.panel_Descripcion');
+            const panelAndante = document.querySelector('.wondererContainer');
+            const boxBtnDirections = document.querySelector('.btn_directions');
+            const panelBienvenida = document.querySelector('.panel_Bienvenida');
+            const boxAuxBtns = document.querySelector('.aux_btns');
+            const modal_shadow = document.querySelector('.modal_shadow');
+            
+            panelBienvenida.style.display = 'none';
+            panelDescripcion.style.display = 'none';
+            panelAndante.style.display = 'none';
+            modal_shadow.classList.replace('modalB', 'modalA');//display none
+            
             switch (pos) {
-                case 'A':
-                    panelAndante.classList.replace('posB','posA');
-                    boxBtnDirections.classList.replace('posBtnB','posBtnA');
-                    boxAuxBtns.classList.replace('auxB','auxA');
-                    modal_shadow.classList.replace('modalA','modalB');
-                    panelBienvenida.style.display  = 'none'; 
-                    break;
-                case 'B': 
-                    panelAndante.style.display = 'block';
-                    panelDescripcion.style.display = 'none';
-                    panelAndante.classList.replace('posA','posB');
-                    boxBtnDirections.classList.replace('posBtnA','posBtnB');
-                    boxAuxBtns.classList.replace('auxA','auxB');
-                    modal_shadow.classList.replace('modalB','modalA');
-                    panelBienvenida.style.display  = 'none';
-
-                    break;
-                case 'C':
-                    panelDescripcion.style.display = 'none';
-                    panelAndante.style.display = 'none';
-                    modal_shadow.classList.replace('modalB','modalA');
-                    panelBienvenida.style.display  = 'none';
-                    break;
-                case 'D'://panel bienvenida
-                    panelBienvenida.style.display  = 'block'; 
-                    panelDescripcion.style.display = 'none';
-                    panelDescripcion.style.display = 'none';
-                    panelAndante.style.display = 'none';
-                    modal_shadow.classList.replace('modalB','modalA');
-                    break;
-                default:
-                    panelBienvenida.style.display  = 'none'; 
-                    modal_shadow.classList.replace('modalB','modalA');      
-                    break;
+              case 'A':
+                panelAndante.classList.replace('posB', 'posA');
+                boxBtnDirections.classList.replace('posBtnB', 'posBtnA');
+                boxAuxBtns.classList.replace('auxB', 'auxA');
+                modal_shadow.classList.replace('modalA', 'modalB');//display block
+                break;
+              case 'B':
+                panelAndante.style.display = 'block';
+                panelDescripcion.style.display = 'none';
+                panelAndante.classList.replace('posA', 'posB');
+                boxBtnDirections.classList.replace('posBtnA', 'posBtnB');
+                boxAuxBtns.classList.replace('auxA', 'auxB');
+                break;
+              case 'C': // panel bienvenida
+                panelBienvenida.style.display = 'block';
+                break;
+              default:
+                modal_shadow.classList.replace('modalB', 'modalA');
+                break;
             }
-        }
-
+          }
 
        
         

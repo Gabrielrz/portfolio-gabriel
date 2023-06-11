@@ -5,13 +5,12 @@
       "titulo": "Dualad",
       "descripcion": "Dualad es una aplicacion en la que puedes adquirir un cubo en un espacio 3D y decorarlo con una imagen a modo de anuncio publicitario",
       "tecnologias": [
-        "Php",
-        "Laravel",
-        "Firebase",
+        "Php-7",
+        "Laravel-9",
         "Threejs",
         "Cloud Vision",
         "Javascript",
-        ""
+        "Stripe"
       ],
       "urlButton": "https://www.dualad.es",
       "urlGit": "https://github.com/Gabrielrz",
@@ -19,7 +18,7 @@
     },
     {
       "titulo": "Glapp",
-      "descripcion": "Glapp es una aplicación en proceso que servirá para localizar artículos y productos locales..",
+      "descripcion": "Glapp es una aplicación en proceso de desarrollo que servirá para localizar artículos y productos locales..",
       "tecnologias": [
         "Java",
         "Firebase",
@@ -34,12 +33,12 @@
     },
     {
       "titulo": "Fiatec",
-      "descripcion": "Fiatec es una aplicación para dispositivos Android, que sirve para gestionar deudas o prestamos.",
+      "descripcion": "Fiatec es una aplicación para dispositivos Android en pruebas, que sirve para gestionar deudas o prestamos.",
       "tecnologias": [
         "Java",
         "Firebase",
         "Google Cloud Vision",
-        "MvvM"
+        "Arquitectura MvvM"
       ],
       "urlButton": "https://play.google.com/store/apps/details?id=com.regular.fiatec",
       "urlGit": "https://github.com/Gabrielrz/Fiatec-info",
