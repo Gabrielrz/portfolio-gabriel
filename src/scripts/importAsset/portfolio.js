@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import LodL from '../performance/levelOfDetail';
+import EventEmitter from '../utils/eventEmitter';
 
 //import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';//mobile
 
-export default class PortfolioGTLF{
+export default class PortfolioGTLF extends EventEmitter{
 
     constructor(scene,url,url_bin){
-			
+			super()
 			this.lodL = new LodL();
 			this.loadingManager = new THREE.LoadingManager()
 			this.url = url;
@@ -57,8 +58,8 @@ export default class PortfolioGTLF{
 				directionalLight.intensity =1.0;
 
 				resolve(gltf);
-				//console.log(gltf);
-		
+				
+				this.trigger('onLoad');
 
 			});
 		});	

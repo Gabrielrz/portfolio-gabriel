@@ -8,11 +8,10 @@ export default class Sizes{
         this.isMovil = (window.innerWidth<=767)? true:false;
         this.far = this.getFar;
     }
-    onResize(render,camera){
+    onResize(render,camera,scene){
         render.setPixelRatio(this.pixelRatio);
         render.setSize( this.width, this.height );
         camera.aspect = this.aspect;
-        console.log("pixelRatio",this.pixelRatio);
         window.addEventListener("resize",()=>{
             
             this.width = window.innerWidth;
@@ -23,7 +22,7 @@ export default class Sizes{
             render.setSize( this.width, this.height );
             camera.aspect = this.aspect;
             camera.updateProjectionMatrix();
-           
+            render.render( scene,camera );
         })
     }
 

@@ -3,14 +3,19 @@ import * as THREE from 'three';
 
 import { gsap } from "gsap";
 import base from "/src/assets/images/base.png";
-export default class Background{//creado con chatGPT
+import EventEmitter from '../utils/eventEmitter';
+export default class Background extends EventEmitter{//creado con chatGPT
 
 
     constructor(scene){
+        super()
         this.scene = scene;
-        const texture = new THREE.TextureLoader().load( base );
-        this.scene.background = texture;
-        //this.particulas();
+        const texture = new THREE.TextureLoader().load( base,(t)=>{
+            this.scene.background = t;
+            this.particulas();
+            this.trigger('onLoad')
+        } );
+        
     }
 
     particulas(){

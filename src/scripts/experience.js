@@ -2,12 +2,10 @@ import * as THREE from 'three';
 
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import PortfolioGTLF from './importAsset/portfolio';
 import Sizes from './sizes';
 import data from '/src/data/data_portafolio.json';
 import { gsap } from "gsap";
 import Positions from './positions';
-import Background from './background';
 import { InteractionManager } from 'three.interactive';
 //imagenes textura screen
 import info_default from '/src/assets/images/info_default.png';
@@ -17,14 +15,15 @@ import info_screen2 from '/src/assets/images/info_screen2.png';
 import info_screen1_movil from '/src/assets/images/info_screen1_movil.png';
 import info_screen2_movil from '/src/assets/images/info_screen2_movil.png';
 import info_screen3_movil from '/src/assets/images/info_screen3_movil.png';
-import gltf_bin from  '/src/assets/models/museum8optimized.bin?url';
-import glt_url from  '/src/assets/models/museum8optimized.gltf?url';
+
+import Importer from './importAsset/importer';
 
 
 
 export default class Experience{
 
     constructor(canvas){
+            
             this.positionMarker = 0;//se utiliza como referencia para los eventos eventsFocusElement y eventsBtnsAuxiliar
             this.rotationSpeed = 0.001;
             this.sizes = new Sizes();
@@ -39,8 +38,6 @@ export default class Experience{
             
             this.renderer.setSize( this.sizes.width, this.sizes.height );
           
-
-            this.background = new Background(this.scene);
            
             this.camera = new THREE.PerspectiveCamera( this.sizes.getFov , this.sizes.aspect, 1, this.sizes.far );
             const initPosC = this.positions.positionInitialMuseum.camera;
@@ -48,35 +45,60 @@ export default class Experience{
 
             //interaction manager
             this.interactionManager = new InteractionManager(this.renderer,this.camera,this.renderer.domElement);
-            this.sizes.onResize(this.renderer,this.camera);
+            this.sizes.onResize(this.renderer,this.camera,this.scene);
             this.setMenu();
             this.btnWelcomeContinue();
             this.eventsBtnsAuxiliar();
-            this.model =  new PortfolioGTLF(this.scene,glt_url,gltf_bin);
+           
+
+            //this.stats = new Stats()
+            //document.body.appendChild(this.stats.dom)
+
             
-
-            this.stats = new Stats()
-            this.stats.dom.style.left='50%';
-            document.body.appendChild(this.stats.dom)
-
-            this.model.prom.then((gltf)=>{
-                this.lodL = this.model.lodL;
-                //this.exchangetLod(this.lodL);(no en uso por mejora)
-               this.insteadOfLod(gltf.scene);
-               
-                
-               
-                
-                this.buildControls();
-                
-                console.log(THREE.REVISION);
-                this.animate();
-                
-        
-            });
-
+            this.preloader()
+            
             
     }
+
+
+    preloader(){
+        this.importer  = new Importer(this.scene);
+        this.importer.resources.portfolio.prom.then((gltf)=>{
+            //this.lodL = this.importer.countResources.portfolio.lodL;
+            //this.exchangetLod(this.lodL);(no en uso por mejora)
+            this.insteadOfLod(gltf.scene);
+            this.buildControls();
+            this.render();
+        });
+        var boxOverlay =  document.querySelector('.overlay');
+        var animOverLay =  document.querySelector('.animationLoader');
+        var descripcionOverLay = document.querySelector('.descripcionOverLay');
+        let master = gsap.timeline()
+        var durations = 0.5;
+        master.to('.animationLoader',{rotate:360,duration:3,repeat:-1,ease:'linear'})
+        this.importer.on('onComplete',(e)=>{
+            descripcionOverLay.style.display = 'none';
+            master.clear();
+            master.to('.animationLoader',{scale:1 ,duration:durations,ease:'linear'});
+            master.to('.animationLoader',{scale:.3,duration:durations,ease:'linear'});
+            master.to('.animationLoader',{scale:.7,duration:durations,ease:'linear'});
+            master.to('.animationLoader',{scale:.3,duration:durations,ease:'linear'});
+            master.to('.animationLoader',{scale: .4,duration:durations,ease:'linear'});
+            master.to('.animationLoader',{scale: 20,duration:durations,ease:'linear'});
+            master.to('.overlay',{
+                opacity:0,
+                display:'none',
+                ease:"linear",
+                duration:2,
+                onComplete:()=>{
+                    this.animate()//se llama cuando no intefiera con animaciones
+                }
+            });
+                     
+           
+        })
+    }
+
     /**NO EN USO
      * @description este metodo busca los objetos contenidos dentro 
      * de el objeto LOD y re-aplica los eventos a todos ellos a la vez.
@@ -136,23 +158,15 @@ export default class Experience{
     }
 
     animate() {
-        
         requestAnimationFrame( this.animate.bind(this) );
-        
         this.render();
-        
         
     }
 
     render(){
         this.controls.update();
-        
         this.camera.updateMatrixWorld(true);
-        this.stats.update();
-      
         this.renderer.render( this.scene, this.camera );
-        
-
     }
 
     /**
@@ -166,6 +180,7 @@ export default class Experience{
         //this.interactionManager.update();
         //this.lodL.checkLODLevel(this.camera);
          // console.log(this.renderer.info.render);
+         //this.stats.update();
     }
 
 
@@ -253,13 +268,13 @@ export default class Experience{
 
 
     eventsSocialNetwork(buttons){
-        console.log(buttons);
+        
         buttons.forEach(button => {
             this.interactionManager.add(button);    
             button.addEventListener('click',(event)=>{
                 event.stopPropagation();
                 
-                if(button.name =='buttonInstagram'){
+                if(button.name == 'buttonInstagram'){
                     window.open(data.socialNetworks.urlInstagram);
                 }
                 if(button.name == 'buttonGithub'){
@@ -394,7 +409,9 @@ export default class Experience{
                 duration:1,
                 ease: ease,
                     onUpdate:()=>{
+                        
                         this.camera.lookAt(pControls.x,pControls.y,pControls.z);     
+                        
                     }
             });
             gsap.to(this.controls.target,{
@@ -404,6 +421,7 @@ export default class Experience{
                 duration:1,
                 ease: ease,
                     onUpdate:()=>{
+                        
                         this.controls.update();
                     },
                     onComplete:()=>{
@@ -426,7 +444,9 @@ export default class Experience{
                 duration:1,
                 ease:'sine.out',
                     onUpdate:()=>{
-                        this.lodL.lod.update(this.camera);
+                        
+                        //this.lodL.lod.update(this.camera);
+                        
                         this.camera.lookAt(pControls.x,pControls.y,pControls.z);
                         
                     }
@@ -438,11 +458,8 @@ export default class Experience{
                 duration:2,
                 ease:'sine.out',
                     onUpdate:()=>{
-                        
-                        this.lodL.lod.update(this.camera);
+                        //this.lodL.lod.update(this.camera);
                         this.controls.update();
-                    },
-                    onComplete:()=>{
                     }
             });
             return tl;
